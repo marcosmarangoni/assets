@@ -1,2 +1,3 @@
-var $ = require('jquery');
-var bootstrap = require('bootstrap');
+$("#teste").click(function () {
+    alert("Click works");
+});

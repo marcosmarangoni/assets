@@ -1,11 +1,72 @@
 @import "bootstrap/scss/bootstrap";
+@import 'font-awesome/scss/solid.scss';
+@import 'font-awesome/scss/fontawesome.scss';
+@import url('font-awesome/webfonts/fa-solid-900.eot');
+@import url('font-awesome/webfonts/fa-solid-900.svg');
+@import url('font-awesome/webfonts/fa-solid-900.ttf');
+@import url('font-awesome/webfonts/fa-solid-900.woff');
+@import url('font-awesome/webfonts/fa-solid-900.woff2');
+
+@import url('https://fonts.googleapis.com/css?family=Oswald');
+
+/* Html Layouts */
+html {
+    background-image: url(/images/html_background.jpeg);
+    background-size: cover;
+}
+html::after {
+    content: "";
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.445);
+}
+
+/* Body Layouts */
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    position: relative;
+    z-index: 1;
+    margin: auto;
+    width: 80%;
+    height: 100%;
+    background-color: rgba(255, 255, 240, 0.8);
+    border-radius: 10px;
 }
-a {
-  color: #00B7FF;
+
+nav {
+    font-family: Oswald;
 }
-a#teste {
-  color: #00B7FF;
+
+/* Header layouts */
+header img {
+    height: 40vh;
+}
+img {
+    width: 100%;
+}
+
+header h1 {
+    text-align: center;
+}
+
+/* FOOTER STYLES */
+footer {
+    font: normal small-caps bold 1em/3em Oswald;
+    text-align: center;
+    background-color: ivory;
+    border-radius: 0px 0px 10px 10px;
+}
+
+div footer{
+    margin-top: 5px;
+}
+
+.main-page-content {
+    margin: 1%;
+}
+
+.main-page-content .nav {
+    font-family: Oswald;
 }
