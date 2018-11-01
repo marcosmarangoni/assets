@@ -1,7 +1,21 @@
-// const Users = require('../models/user');
+const User = require('../models/user');
 
+// POST method
 exports.create_user = function(req, res) {
-  res.render('users/create');
+  const userParams = {
+    username: req.body.email,
+    password: req.body.password,
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    date_of_birth: '01-01-1990',
+  };
+  const user = new User(userParams);
+  user.save(function(err){
+    if(err){
+      res.render('users/create', {error:true})
+    }
+    res.render('users/create', {error:false});
+  });
 };
 
 exports.read_user = function(req, res) {
