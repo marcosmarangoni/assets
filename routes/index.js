@@ -9,4 +9,11 @@ router.get('/form', function(req, res, next) {
   res.render('home/form');
 });
 
+var ativoController = require('../controllers/ativoController');
+router.get('/ativos', ativoController.index);
+
 module.exports = router;
+
+
+
+/* res.render('ativos/index', { title: 'Express' }  */
