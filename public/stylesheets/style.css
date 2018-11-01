@@ -10269,18 +10269,18 @@ body {
   background-color: rgba(255, 255, 240, 0.8);
   border-radius: 10px; }
 
+/* Navigation layouts */
 nav {
   font-family: Oswald; }
 
 /* Header layouts */
-header img {
-  height: 40vh; }
+header {
+  margin-bottom: 1%; }
+  header img {
+    height: 40vh; }
 
 img {
   width: 100%; }
-
-header h1 {
-  text-align: center; }
 
 /* FOOTER STYLES */
 footer {
@@ -10291,6 +10291,16 @@ footer {
 
 div footer {
   margin-top: 5px; }
+
+/* Form layout */
+div.user-form-container {
+  margin-left: 25%;
+  margin-bottom: 2%;
+  background-color: ivory;
+  border-radius: 10px; }
+
+form.user-form {
+  padding: 5%; }
 
 .main-page-content {
   margin: 1%; }

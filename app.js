@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var hbs = require('express-handlebars');
 var sassMiddleware = require('node-sass-middleware');
 
 var indexRouter = require('./routes/index');
@@ -13,12 +14,16 @@ var app = express();
 //Set up mongoose connection
 var mongoose = require('mongoose');
 var mongoDB = 'mongodb://marangoni:m4r4ng0n1@ds045107.mlab.com:45107/node-assets';
-mongoose.connect(mongoDB);
+mongoose.connect(mongoDB, {useNewUrlParser:true});
 mongoose.Promise = global.Promise;
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-// view engine setup
+app.engine('hbs', hbs({
+    defaultLayout: 'layout',
+    layoutsDir: path.join(__dirname, 'views', 'layouts'),
+    extname: 'hbs'
+}));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
@@ -50,7 +55,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.render('layouts/error');
 });
 
 module.exports = app;

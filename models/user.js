@@ -8,37 +8,37 @@ var UserSchema = new Schema(
             type: String,
             required: [true, "An username is required"],
             validate: {
-                validator: validateSpecialChar(v),
-                message: wrongFormat(v)
+                validator: v => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v),
+                message: props => `${props.value} is in a wrong format!`
             },
-            max: 100
+            max: [50, 'Sorry you reached the maximum number of characters']
         },
         password: {
             type: String,
             required: [true, "A password is required"],
-            max: 100,
             validate: {
-                validator: validateSpecialChar(v),
-                message: wrongFormat(v)
-            }
+                validator: v => /^[\w\@\*]+$/.test(v),
+                message: props => `${props.value} is in a wrong format!`
+            },
+            max: [30, 'Sorry you reached the maximum number of characters']
         },
         first_name: {
             type: String,
             required: [true, "Please insert your first name"],
-            max: 100,
             validate: {
-                validator: validateWord(v),
-                message: wrongFormat(v)
-            }
+                validator: v => /^[\w']+$/.test(v),
+                message: props => `${props.value} is in a wrong format!`
+            },
+            max: [30, 'Sorry you reached the maximum number of characters']
         },
         last_name: { 
             type: String, 
             required: [true, "Please insert your last name"], 
-            max: 100,
             validate: {
-                validator: validateWord(v),
-                message: wrongFormat(v)
-            } 
+                validator: v => /^[\w']+$/.test(v),
+                message: props => `${props.value} is in a wrong format!`
+            },
+            max: [30, 'Sorry you reached the maximum number of characters']
         },
         date_of_birth: { 
             type: Date, 
@@ -46,19 +46,6 @@ var UserSchema = new Schema(
         }
     }
 );
-
-function validateSpecialChar(validate) {
-    return /^[\w\@\*]+$/.test(username);
-}
-function validateWord(validate) {
-    return /^[\w]+$/.test(validate);
-}
-function validateDate(date) {
-    return /^(0[1-9]|1\d|2\d|3[01])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/.validate(date);
-}
-function wrongFormat(input) {
-    return `${input} is in a wrong format!`;
-}
 
 // Virtual for author's full name
 UserSchema
@@ -68,4 +55,4 @@ UserSchema
     });
 
 //Export model
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('user', UserSchema);
