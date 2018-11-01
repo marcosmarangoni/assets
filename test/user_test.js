@@ -12,6 +12,11 @@ var user_params = {
 };
 
 describe("Users test mocha", function(){
+    before(function(){
+        User.collection.drop().then(function(error, result){
+            console.log(error);
+        });
+    });
     beforeEach(function(){
         user_params = {
             username: Faker.internet.email(),
@@ -22,6 +27,7 @@ describe("Users test mocha", function(){
         };
     });
     it("Fails to add username, special characters [$%()]", function(done){
+        user_params.username += '$';
         var user = new User(user_params);
         user.save(function(error){
             assert(error.errors.username.message, `${user_params.username} is in a wrong format!`);
@@ -55,7 +61,7 @@ describe("Users test mocha", function(){
     it('Add a user', function(done){
         user_params = {
             username: Faker.internet.email(),
-            password: Faker.internet.password(10),
+            password: Faker.internet.userName(),
             first_name: Faker.name.firstName(),
             last_name: Faker.name.lastName(),
             date_of_birth: Faker.date.between('01-01-1900', '01-01-2000')

@@ -22,3 +22,5 @@ before(function (done) {
 after(function () {
     mongoose.connection.close();
 });
+
+module.exports = mongoose;
