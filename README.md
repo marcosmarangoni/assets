@@ -2,7 +2,6 @@
 Calculo da TIR
 
 # Components being used
-======
 * Node.js
 * NPM
      Node package manager
@@ -15,6 +14,6 @@ Calculo da TIR
 * Faker (To create fake names)
      Use it to create fake names, password, email, card numbers ...
      
-======
+
 * When pulling a branch always remember to use npm install
 * To test the workspace type npm run test   
