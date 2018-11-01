@@ -1,0 +1,14 @@
+{
+    "path-autocomplete.pathMappings": {
+        "/" : ["${folder}/public/", "${folder}/models/"],
+        "javascripts" : "${folder}/public/javascripts",
+        "stylesheets" : "${folder}/public/stylesheets",
+        "images"      : "${folder}/public/images" 
+    },
+    "path-autocomplete.triggerOutsideStrings": true,
+    "git.ignoreLimitWarning": true,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.acceptSuggestionOnCommitCharacter": true,
+    "files.eol": "\n",
+}
