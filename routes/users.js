@@ -1,11 +1,11 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router;
 
-var userController = require('../controllers/userController');
+const userController = require('../controllers/userController');
 
 /* GET users listing. */
-router.get('/', function(req, res){
-    res.render('users/create', { anyArray: [1,2,3], condition: false });
+router.get('/', function(req, res) {
+  res.render('users/create', {anyArray: [1, 2, 3], condition: false});
 });
 router.get('/create', userController.create_user);
 router.get('/read/:id', userController.read_user);

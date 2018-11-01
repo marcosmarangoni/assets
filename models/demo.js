@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 
 const DemoSchema = new Schema({
-    name: String,
-    weigth: Number
+  name: String,
+  weigth: Number,
 });
 
 const Demo = mongoose.model('Demo', DemoSchema);
