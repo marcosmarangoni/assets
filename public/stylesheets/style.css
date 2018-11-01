@@ -10247,8 +10247,7 @@ readers do not read off random characters that represent icons */
 
 /* Html Layouts */
 html {
-  background-image: url(/images/html_background.jpeg);
-  background-size: cover; }
+  background: url(/images/html_background.jpeg) no-repeat center center fixed; }
 
 html::after {
   content: "";
@@ -10261,7 +10260,23 @@ html::after {
 
 /* Body Layouts */
 body {
+  position: relative;
+  z-index: 1;
+  margin: auto;
+  width: 80%;
+  height: 100%;
+  background-color: rgba(255, 255, 240, 0.8);
+  border-radius: 10px; }
 
+/* Navigation layouts */
+nav {
+  font-family: Oswald; }
+
+/* Header layouts */
+header {
+  margin-bottom: 1%; }
+  header img {
+    height: 40vh; }
 
 img {
   width: 100%; }
