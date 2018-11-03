@@ -29,3 +29,25 @@ $('form#createUserForm').submit(function (e) {
     // Dont trigger the form action
     e.preventDefault();
 });
+
+var usersDataTable = $('#usersDataTable').DataTable({
+    ajax: {
+        url: '/users/list_users',
+        type: 'post',
+        dataSrc: ''
+    },
+    columns: [
+        { 
+            data: 'username',
+        },
+        {
+            data: 'password'
+        },
+        {
+            data: 'first_name'
+        },
+        {
+            data: 'last_name'
+        }
+    ]
+});
