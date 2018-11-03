@@ -4,12 +4,11 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 
 /* GET users listing. */
-router.get('/', function(req, res) {
-  res.render('users/create', {error: false});
-});
-router.post('/create_user', userController.create_user);
-router.get('/read/:id', userController.read_user);
-router.get('/update/:id', userController.update_user);
-router.get('/remove/:id', userController.remove_user);
+router.get('/', (req, res) => res.redirect('/users/create'));
+router.get('/create', userController.create);
+router.post('/create_user', userController.createUser, userController.create);
+router.get('/read/:id', userController.readUser);
+router.get('/update/:id', userController.updateUser);
+router.get('/remove/:id', userController.removeUser);
 
 module.exports = router;
