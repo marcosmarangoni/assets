@@ -37,10 +37,6 @@ exports.index = function(req, res) {
         element.retorno = IRR.calc(element);
     });
 
-    //console.log(ativos[0]);
-    //let a = console.log(IRR.circle(5));
-    //let b = console.log(IRR.IRRA("5"));
-
-    res.render('ativos/index', { title: 'Expresssa', ativos /*,  query : JSON.stringify( req.query) */ });
+    res.render('ativos/index', { title: 'Expresssa', ativos });
     
 };
