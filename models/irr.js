@@ -16,7 +16,7 @@
     }
 
     function calc(ativo) {
-        ativo.trade.push({ dia : "31-10-2018" , valor: Number((ativo.saldo * ativo.unitario).toFixed(2))});
+        ativo.trade.push({ date : "03-11-2018", tipo: "" , value: Number((ativo.saldo * ativo.unitario).toFixed(2))});
         console.log(ativo);
         return irr(ativo.trade);
     }
@@ -29,7 +29,7 @@
         var interval_total = 0;
 
         for (i = 0; i < fluxo.length; ++i) {
-            date_splited = fluxo[i].dia.split('-');
+            date_splited = fluxo[i].date.split('-');
             dia = new Date(date_splited[2], (date_splited[1]-1), date_splited[0], 0,0,0,0);
             if(date_start==0) { // Primeiro trade
                 date_start = dia;
@@ -45,7 +45,7 @@
                 fluxo[i].interval = interval;
                 interval_total += Math.abs(interval); //Protect Mesmo DIa
             }
-            if(fluxo[i].valor > 0) {sum_in += fluxo[i].valor;} else {sum_out -= fluxo[i].valor;}
+            if(fluxo[i].value > 0) {sum_in += fluxo[i].value;} else {sum_out -= fluxo[i].value;}
             //console.log(fluxo[i]);
         }
 
@@ -65,7 +65,7 @@
             vp_all = 0;
 
             for(x=0; x < fluxo.length; ++x) {
-                vp_all += fluxo[x].valor / guess ** fluxo[x].interval;
+                vp_all += fluxo[x].value / guess ** fluxo[x].interval;
             }
             console.log('Try: '+i+' VP: '+vp_all);
 
