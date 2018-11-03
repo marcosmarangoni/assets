@@ -10247,8 +10247,7 @@ readers do not read off random characters that represent icons */
 
 /* Html Layouts */
 html {
-  background-image: url(/images/html_background.jpeg);
-  background-size: cover; }
+  background: url(/images/html_background.jpeg) no-repeat center center fixed; }
 
 html::after {
   content: "";

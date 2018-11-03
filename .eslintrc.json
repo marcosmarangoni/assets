@@ -1,9 +1,26 @@
 {
-    "extends": "google",
+  "extends": "eslint:recommended",
     "parserOptions": {
-        "ecmaVersion": 2018
+        "ecmaVersion": 2018,
+        "sourceType": "module",
+        "ecmaFeatures": {
+          "globalReturn": true,
+          "impliedStrict": true
+        }
     },
     "env": {
-        "es6": true
+        "es6": true,
+        "node": true,
+        "mongo": true,
+        "mocha": true,
+        "jquery": true,
+        "browser": true,
+        "webextensions": true,
+        "shared-node-browser": true
+    },
+    "rules": {
+      "eqeqeq":"error",
+      "quotes": ["error", "single"],
+      "no-console":"warn"
     }
 }
