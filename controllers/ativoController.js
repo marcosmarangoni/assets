@@ -1,7 +1,12 @@
 var IRR = require('../models/irr');
+var IRR = require('../models/irr');
 
-// Display list of all Authors.
-exports.index = function(req, res) {
+/**
+ * 
+ * @param {Request} request 
+ * @param {Response} response 
+ */
+async function index(request, response) {
     let ativos = 
     [{
         codigo : "ITSA4",
@@ -37,6 +42,63 @@ exports.index = function(req, res) {
         element.retorno = IRR.calc(element);
     });
 
-    res.render('ativos/index', { title: 'Expresssa', ativos });
+    response.render('ativos/index', { title: 'Expresssa', ativos }); 
+}
+
+
+/**
+ * 
+ * @param {Request} request 
+ * @param {Response} response 
+ */
+async function create(request, response) {
+    response.render('ativos/create'); 
+}
+
+/**
+ * 
+ * @param {Request} request 
+ * @param {Response} response 
+ */
+async function createAtivo(request, response) {
+
+    const ativo = {
+        codigo: request.body.codigo,
+        date: request.body.date,
+        quantidade: request.body.quantidade,
+        tipo: request.body.tipo,
+        valor: request.body.valor,
+    }
+    response.send(ativo);
+}
+/*
+
+async function createUser (request, response) {
+    const userParams = {
+        username: request.body.email,
+        password: request.body.password,
+        first_name: request.body.first_name,
+        last_name: request.body.last_name,
+        date_of_birth: '01-01-1990',
+    };
+    const user = new User(userParams);
+    try {
+        //await user.save();
+        response.send();
+    } catch (error) {
+        response.send({ error: true, errors: error.errors })
+    }
+}
+*/
+module.exports = {
+    /*
+     * Get methods
+     */
+    index,
+    create,
     
-};
+    /*
+     * Post methods
+     */
+    createAtivo,
+}
