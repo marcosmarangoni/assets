@@ -7,6 +7,7 @@ const UserSchema = new Schema(
       username: {
         type: String,
         required: [true, 'An username is required'],
+        unique: [true, 'Please select another username'],
         validate: {
           validator: (v) =>
             /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v),
@@ -18,7 +19,7 @@ const UserSchema = new Schema(
         type: String,
         required: [true, 'A password is required'],
         validate: {
-          validator: (v) => /^[\w\@\*]+$/.test(v),
+          validator: (v) => /^[\w@*]+$/.test(v),
           message: (props) => `${props.value} is in a wrong format!`,
         },
         max: [30, 'Sorry you reached the maximum number of characters'],

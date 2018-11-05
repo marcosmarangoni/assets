@@ -3,13 +3,16 @@ const router = express.Router();
 
 const userController = require('../controllers/userController');
 
-/* GET users listing. */
-router.get('/', function(req, res) {
-  res.render('users/create', {anyArray: [1, 2, 3], condition: false});
-});
-router.get('/create', userController.create_user);
-router.get('/read/:id', userController.read_user);
-router.get('/update/:id', userController.update_user);
-router.get('/remove/:id', userController.remove_user);
+/* GET */
+router.get('/', (req, res) => res.redirect('/users/create'));
+router.get('/create', userController.create);
+router.get('/read/:id', userController.readUser);
+router.get('/update/:id', userController.updateUser);
+router.get('/remove/:id', userController.removeUser);
+router.get('/list', userController.list);
+
+/* POST */
+router.post('/create_user', userController.createUser, userController.create);
+router.post('/list_users', userController.listUsers);
 
 module.exports = router;
