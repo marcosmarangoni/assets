@@ -1,22 +1,7 @@
 /** irr.js **/
 
-    //console.log("Model used");
-    function IRRA(data) {
-        return data + "aqui";
-    }
-    var IRRA = function (data) {
-        //this.data = data;
-        console.log("aa");
-        return data;
-    }
-
-    var PI = Math.PI;
-    function circle (radius) {
-        return radius * radius * PI;
-    }
-
     function calc(ativo) {
-        ativo.trade.push({ date : "03-11-2018", tipo: "" , value: Number((ativo.saldo * ativo.unitario).toFixed(2))});
+        ativo.trade.push({ date : "03-11-2018", tipo: "p" , value: Number((ativo.saldo * ativo.unitario).toFixed(2))});
         console.log(ativo);
         return irr(ativo.trade);
     }
@@ -88,7 +73,6 @@
         return Number(((guess-1)*100).toFixed(2));
     }
 
-module.exports.circle = circle;
+
 module.exports.calc = calc;
-module.exports.IRRA = IRRA;
     

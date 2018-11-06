@@ -38,7 +38,7 @@ async function index(request, response) {
     ];
 
     //var Ativo = mongoose.model('../models/ativo', AtivoSchema);
-    let Ativos = await Ativo.find();
+    //let Ativos = await Ativo.find();
     //query.limit(5);
     //query.select('codigo trade saldo unitario');
     //let AtivoList = query.exec(err, AtivoList);
@@ -64,16 +64,30 @@ async function index(request, response) {
         element.retorno = IRR.calc(element);
         element.aaaaaa = "aaaaaaaaaaaaaaaaaaaa";
     });*/
+
+
+
+    /* *************************************************************************** ESSA E A PARTE QUE FUNCIONA
     for(let x = 0; x < Ativos.length ; ++x) {
         //IRR.calc(element);
         Ativos[x].retorno = IRR.calc(Ativos[x]);
         Ativos[x].aaaaaa = "aaaaaaaaaaaaaaaaaaaa";
     }
     //response.send(Ativos);
-
+    *//////////////////////////////////////////////////////////////////////////////
     
 
-    response.render('ativos/index', { title: 'Expresssa', ativos:Ativos }); 
+    response.render('ativos/index'); 
+}
+
+async function indexList(request, response) {
+    
+    let Ativos = await Ativo.find();
+    Ativos[0].teste = "aaaaaaaaaaaaaaaaaaaa";
+    for(let x = 0; x < Ativos.length ; ++x) {
+        Ativos[x].set('retorno', IRR.calc(Ativos[x]), { strict: false });
+    }
+    response.send(Ativos);
 }
 
 
@@ -141,6 +155,7 @@ module.exports = {
      * Get methods
      */
     index,
+    indexList,
     create,
     
     /*
