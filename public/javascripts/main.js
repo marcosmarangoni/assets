@@ -11,7 +11,6 @@ function whenDone(response) {
 function whenFail() {
     $('#error').html('Something went wrong when sending data to server').show();
 }
-
 $('form#createUserForm').submit(function (e) {
     let form = $(this);
 
