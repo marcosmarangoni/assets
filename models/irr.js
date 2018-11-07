@@ -1,7 +1,7 @@
 /** irr.js **/
 
     function calc(ativo) {
-        ativo.trade.push({ date : "03-11-2018", tipo: "p" , value: Number((ativo.saldo * ativo.unitario).toFixed(2))});
+        ativo.trade.push({ date : "2018-11-06", tipo: "p" , value: Number((ativo.saldo * ativo.unitario).toFixed(2))});
         console.log(ativo);
         return irr(ativo.trade);
     }
@@ -15,16 +15,16 @@
 
         for (i = 0; i < fluxo.length; ++i) {
             date_splited = fluxo[i].date.split('-');
-            dia = new Date(date_splited[2], (date_splited[1]-1), date_splited[0], 0,0,0,0);
+            dia = new Date(date_splited[0], (date_splited[1]-1), date_splited[2], 0,0,0,0); // YYYY-MM-DD
             if(date_start==0) { // Primeiro trade
                 date_start = dia;
                 fluxo[i].interval = 0;
-                //console.log(new Date(Number(date_splited[2])+1, 0, 1, 0,0,0,0));
-                daystoyear_start = Math.ceil(((new Date(Number(date_splited[2])+1, 0, 1, 0,0,0,0)) - dia) /1000 / 3600 / 24);
+                //console.log(new Date(Number(date_splited[0])+1, 0, 1, 0,0,0,0));
+                daystoyear_start = Math.ceil(((new Date(Number(date_splited[0])+1, 0, 1, 0,0,0,0)) - dia) /1000 / 3600 / 24);
             } else {
                 year_start = date_start.getFullYear();
                 year_date = dia.getFullYear();
-                daysonyear = Math.ceil((dia - (new Date(date_splited[2], 0, 1, 0,0,0,0)))/1000 / 3600 / 24);
+                daysonyear = Math.ceil((dia - (new Date(date_splited[0], 0, 1, 0,0,0,0)))/1000 / 3600 / 24);
                 interval = year_date - year_start + (daysonyear/365)  + (daystoyear_start/365) - 1 ;
                 //console.log('daysonyear: '+daysonyear+' daysonyear_start: '+daystoyear_start)
                 fluxo[i].interval = interval;
@@ -46,13 +46,13 @@
         var guess_third = 0;
 
         do {
-            console.log('Guess: '+guess);
+            //console.log('Guess: '+guess);
             vp_all = 0;
 
             for(x=0; x < fluxo.length; ++x) {
                 vp_all += fluxo[x].value / guess ** fluxo[x].interval;
             }
-            console.log('Try: '+i+' VP: '+vp_all);
+            //console.log('Try: '+i+' VP: '+vp_all);
 
             vp_third = vp_second;
             guess_third = guess_second;

@@ -16,12 +16,12 @@ const AtivoSchema = new Schema(
     trade: [{
       type: Object,
       date:{
-        type: Date,  
+        type: Date,  // YYYY-MM-DD 
       },
       tipo: {
         type: String,
       },
-      valor: {
+      value: {
         type: Number,
       },
     }],

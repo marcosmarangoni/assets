@@ -1,7 +1,7 @@
 var IRR = require('../models/irr');
 const Ativo = require('../models/ativo');
 
-/**
+/************************************************************
  * 
  * @param {Request} request 
  * @param {Response} response 
@@ -80,10 +80,14 @@ async function index(request, response) {
     response.render('ativos/index'); 
 }
 
+/************************************************************
+ * 
+ * @param {Request} request 
+ * @param {Response} response 
+ */
 async function indexList(request, response) {
     
     let Ativos = await Ativo.find();
-    Ativos[0].teste = "aaaaaaaaaaaaaaaaaaaa";
     for(let x = 0; x < Ativos.length ; ++x) {
         Ativos[x].set('retorno', IRR.calc(Ativos[x]), { strict: false });
     }
@@ -91,7 +95,7 @@ async function indexList(request, response) {
 }
 
 
-/**
+/************************************************************
  * 
  * @param {Request} request 
  * @param {Response} response 
@@ -100,7 +104,7 @@ async function create(request, response) {
     response.render('ativos/create'); 
 }
 
-/**
+/************************************************************
  * 
  * @param {Request} request 
  * @param {Response} response 
@@ -129,37 +133,52 @@ async function createAtivo(request, response) {
     } catch (error) {
         response.send({ error: true, errors: error.errors })
     }
-    //response.send(ativo);
 }
-/*
 
-async function createUser (request, response) {
-    const userParams = {
-        username: request.body.email,
-        password: request.body.password,
-        first_name: request.body.first_name,
-        last_name: request.body.last_name,
-        date_of_birth: '01-01-1990',
-    };
-    const user = new User(userParams);
-    try {
-        //await user.save();
-        response.send();
-    } catch (error) {
-        response.send({ error: true, errors: error.errors })
-    }
+async function createTrade(request, response) {    
+
+    /*(async () => {
+        try {
+          let ativo = await Ativo.find({_id:request.body._id});
+          console.log('num', ativo);
+        } catch(e) {
+          console.log('Error caught');
+        }
+      })();*/
+
+
+    /* Esse UPDATE funciona!!! *******************************
+    Ativo.findById(request.body._id , function (err, ativo) {
+        if (err) return handleError(err);
+        ativo.set({ "unitario": 2 });
+        ativo.save(function (err, updatedAtivo) {
+          if (err) return handleError(err);
+          response.send(updatedAtivo);
+        });
+    });
+    *//////////////////////////////////////////////////////
+    const id = request.body.id;
+    const novotrade = {date:request.body.date , tipo:request.body.tipo , value:Number(request.body.valor)};
+    await Ativo.findOneAndUpdate({_id: id}, {$push: {trade: novotrade}});
+    await console.log("ID********************************************"+id);
+    await console.log(novotrade);
+    
+    //response.redirect('/ativos');
+
 }
-*/
+
+
 module.exports = {
     /*
      * Get methods
      */
     index,
-    indexList,
     create,
     
     /*
      * Post methods
      */
     createAtivo,
+    indexList,
+    createTrade,
 }
