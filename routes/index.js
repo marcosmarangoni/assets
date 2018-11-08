@@ -17,7 +17,8 @@ router.get('/ativos/create', ativoController.create);
 router.post('/ativos/create', ativoController.createAtivo);
 
 router.post('/ativos/newtrade', ativoController.createTrade);
-
+router.post('/ativos/edit', ativoController.editAtivo);
+router.post('/ativos/edittrade', ativoController.editTrade);
 module.exports = router;
 
 

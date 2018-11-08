@@ -1,5 +1,6 @@
 var IRR = require('../models/irr');
 const Ativo = require('../models/ativo');
+var mongoose = require('mongoose');
 
 /************************************************************
  * 
@@ -7,75 +8,6 @@ const Ativo = require('../models/ativo');
  * @param {Response} response 
  */
 async function index(request, response) {
-    let ativos = 
-    [{
-        codigo : "ITSA4",
-        saldo: 4600,
-        unitario: 11.04,
-        trade: [
-            {date:'03-02-2018', value: -31008.00},
-            {date:'07-03-2018', value:   1027.56},
-            {date:'05-04-2018', value:    799.20},
-            {date:'05-04-2018', value:  -4517.00},
-            {date:'02-07-2018', value:     42.07},
-            {date:'30-08-2018', value:    642.82},
-            {date:'13-09-2018', value: -14130.00},
-            {date:'10-10-2018', value:     46.50}
-        ]
-    },
-    {
-        codigo : "CGAS5",
-        saldo: 700,
-        unitario: 52.49,
-        trade: [
-            {date:'20-02-2017', value:-24040.00},
-            {date:'03-03-2017', value:  1015.00},
-            {date:'23-11-2017', value:  2897.99},
-            {date:'08-01-2018', value:   595.40},
-            {date:'13-09-2018', value: -9742.00}
-        ]
-    }
-    ];
-
-    //var Ativo = mongoose.model('../models/ativo', AtivoSchema);
-    //let Ativos = await Ativo.find();
-    //query.limit(5);
-    //query.select('codigo trade saldo unitario');
-    //let AtivoList = query.exec(err, AtivoList);
-    
-    
-
-    /*query.exec(function (err, AtivoList) {
-        if (err) return handleError(err);
-        // athletes contains an ordered list of 5 athletes who play Tennis
-        AtivoList.forEach(element => {
-            //IRR.calc(element);
-            element.retorno = IRR.calc(element);
-        });
-        ativos.forEach(element => {
-            IRR.calc(element);
-            element.retorno = IRR.calc(element);
-        });
-
-        response.send(AtivoList);
-    });*/
-    /*Ativos.forEach(element => {
-        IRR.calc(element);
-        element.retorno = IRR.calc(element);
-        element.aaaaaa = "aaaaaaaaaaaaaaaaaaaa";
-    });*/
-
-
-
-    /* *************************************************************************** ESSA E A PARTE QUE FUNCIONA
-    for(let x = 0; x < Ativos.length ; ++x) {
-        //IRR.calc(element);
-        Ativos[x].retorno = IRR.calc(Ativos[x]);
-        Ativos[x].aaaaaa = "aaaaaaaaaaaaaaaaaaaa";
-    }
-    //response.send(Ativos);
-    *//////////////////////////////////////////////////////////////////////////////
-    
 
     response.render('ativos/index'); 
 }
@@ -93,7 +25,6 @@ async function indexList(request, response) {
     }
     response.send(Ativos);
 }
-
 
 /************************************************************
  * 
@@ -121,20 +52,27 @@ async function createAtivo(request, response) {
         saldo: request.body.quantidade,
         unitario: unit,
         trade: {
+            trade_id: mongoose.Types.ObjectId(),
             date: request.body.date,
-            value: request.body.valor,
+            value: Number(request.body.valor),
             tipo: request.body.tipo,
         },
     }
     const ativo = new Ativo(ativoParams);
     try {
         await ativo.save();
-        response.send("Deu certo");
+        //response.send("Deu certo");
+        response.redirect('/ativos');
     } catch (error) {
         response.send({ error: true, errors: error.errors })
     }
 }
 
+/************************************************************
+ * 
+ * @param {Request} request 
+ * @param {Response} response 
+ */
 async function createTrade(request, response) {    
 
     /*(async () => {
@@ -146,27 +84,56 @@ async function createTrade(request, response) {
         }
       })();*/
 
-
-    /* Esse UPDATE funciona!!! *******************************
-    Ativo.findById(request.body._id , function (err, ativo) {
-        if (err) return handleError(err);
-        ativo.set({ "unitario": 2 });
-        ativo.save(function (err, updatedAtivo) {
-          if (err) return handleError(err);
-          response.send(updatedAtivo);
-        });
-    });
-    *//////////////////////////////////////////////////////
     const id = request.body.id;
-    const novotrade = {date:request.body.date , tipo:request.body.tipo , value:Number(request.body.valor)};
-    await Ativo.findOneAndUpdate({_id: id}, {$push: {trade: novotrade}});
-    await console.log("ID********************************************"+id);
-    await console.log(novotrade);
-    
-    //response.redirect('/ativos');
+    const novotrade = {
+        trade_id: mongoose.Types.ObjectId(),
+        date:request.body.date,
+        tipo:request.body.tipo,
+        value:Number(request.body.valor)
+    };
 
+    //await console.log(mongoose.Types.ObjectId());
+    //await console.log(novotrade);
+    ativo = await Ativo.findOneAndUpdate({_id: id}, {$push: {trade: novotrade}});
+    await console.log("ID*************"+id);
+    console.log(ativo);
+        
+    response.redirect('/ativos');
 }
 
+/************************************************************
+ * 
+ * @param {Request} request 
+ * @param {Response} response 
+ */
+async function editTrade(request, response) {
+    const id = request.body.id;
+    const tradeid = request.body.tradeid;
+    const editedtrade = {
+        date:request.body.date,
+        tipo:request.body.tipo,
+        value:Number(request.body.valor)
+    };
+    await console.log('edit trade!!!');
+    ativo = await Ativo.findOneAndUpdate({_id: id, "trade.trade_id":tradeid}, {$set: {"trade.$": editedtrade}});
+    console.log(ativo);
+}
+
+/************************************************************
+ * 
+ * @param {Request} request 
+ * @param {Response} response 
+ */
+async function editAtivo(request, response) {
+    await Ativo.findOneAndUpdate({_id: request.body.id}, { 
+        $set: {
+            codigo: request.body.ativo,
+            saldo: Number(request.body.saldo),
+            unitario: Number(request.body.unitario),
+        }
+    });
+    response.redirect('/ativos');
+}
 
 module.exports = {
     /*
@@ -174,11 +141,12 @@ module.exports = {
      */
     index,
     create,
-    
     /*
      * Post methods
      */
     createAtivo,
     indexList,
     createTrade,
+    editAtivo,
+    editTrade,
 }
