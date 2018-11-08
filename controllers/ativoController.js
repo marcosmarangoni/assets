@@ -51,7 +51,7 @@ async function createAtivo(request, response) {
         codigo: request.body.codigo,
         saldo: request.body.quantidade,
         unitario: unit,
-        trade: {
+        trades: {
             trade_id: mongoose.Types.ObjectId(),
             date: request.body.date,
             value: Number(request.body.valor),
@@ -94,10 +94,9 @@ async function createTrade(request, response) {
 
     //await console.log(mongoose.Types.ObjectId());
     //await console.log(novotrade);
-    ativo = await Ativo.findOneAndUpdate({_id: id}, {$push: {trade: novotrade}});
-    await console.log("ID*************"+id);
-    console.log(ativo);
-        
+    ativo = await Ativo.findOneAndUpdate({_id: id}, {$push: {trades: novotrade}});
+    //await console.log("ID*************"+id);
+            
     response.redirect('/ativos');
 }
 
@@ -110,13 +109,16 @@ async function editTrade(request, response) {
     const id = request.body.id;
     const tradeid = request.body.tradeid;
     const editedtrade = {
+        trade_id: mongoose.Types.ObjectId(),
         date:request.body.date,
         tipo:request.body.tipo,
         value:Number(request.body.valor)
     };
-    await console.log('edit trade!!!');
-    ativo = await Ativo.findOneAndUpdate({_id: id, "trade.trade_id":tradeid}, {$set: {"trade.$": editedtrade}});
-    console.log(ativo);
+
+    //await console.log('Trade: ' +id+ ' Trade_ID: '+tradeid  );
+    await Ativo.findOneAndUpdate({_id: id, "trades.trade_id": mongoose.Types.ObjectId(tradeid)}, {$set: { "trades.$":editedtrade }});
+    
+    response.redirect('/ativos');
 }
 
 /************************************************************

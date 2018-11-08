@@ -13,7 +13,7 @@ const AtivoSchema = new Schema(
     unitario: {
       type: Number,
     },
-    trade: [{        // Tambem tem Object ID
+    trades: [{        // Tambem tem Object ID
       type: Object,
       date:{
         type: Date,  // YYYY-MM-DD 

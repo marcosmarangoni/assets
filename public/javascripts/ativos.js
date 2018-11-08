@@ -2,9 +2,9 @@
 /* Formatting function for row details - modify as you need */
 function formatTable ( d ) {
     // d is the original data object for the row
-    let t =  '<table cellpadding="4" cellspacing="0" border="0" style="padding-left:50px;width:100%;">';
+    let t =  '<table cellpadding="4" cellspacing="0" style="width:100%;">';
     let tipo;
-    d.trade.forEach(element => {
+    d.trades.forEach(element => {
         var disabled = "";
         switch(element.tipo) {
             case "c": 

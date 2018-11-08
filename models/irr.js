@@ -1,9 +1,9 @@
 /** irr.js **/
 
     function calc(ativo) {
-        ativo.trade.push({ date : "2018-11-06", tipo: "p" , value: Number((ativo.saldo * ativo.unitario).toFixed(2))});
-        console.log(ativo);
-        return irr(ativo.trade);
+        ativo.trades.push({ date : "2018-11-06", tipo: "p" , value: Number((ativo.saldo * ativo.unitario).toFixed(2))});
+        //console.log(ativo);
+        return irr(ativo.trades);
     }
 
     function irr(fluxo) {
@@ -69,7 +69,7 @@
             ++i;
         }
         while (Math.abs(vp_all) > 0.01 && guess<=100 && i <= 500);
-        //console.log('IRR Official: '+Number((guess-1)*100).toFixed(2));
+        console.log('IRR: '+Number((guess-1)*100).toFixed(2)+' Try:'+i );
         return Number(((guess-1)*100).toFixed(2));
     }
 
