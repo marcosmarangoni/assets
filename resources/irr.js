@@ -3,7 +3,7 @@
     function calc(ativo) {
         var today = new Date();
         ativo.trades.push(
-            {date : today.getFullYear()+"-"+(1+today.getMonth())+("-0"+today.getDate()).slice(-3),
+            {date : today.getFullYear()+"-"+(1+today.getMonth())+"-"+("0"+today.getDate()).slice(-2),
              tipo: "p" , value: Number((ativo.saldo * ativo.unitario).toFixed(2))
         });
         
@@ -63,7 +63,7 @@
         var taxa;
         taxa = Math.pow(fluxo[1].value/-fluxo[0].value,(1/Math.abs(fluxo[1].interval)))-1;
         //console.log(fluxo[1].value/-fluxo[0].value);
-        //console.log(fluxo[1].interval);
+        console.log("SimpleReturn");
         return (taxa*100).toFixed(2);
     }
 

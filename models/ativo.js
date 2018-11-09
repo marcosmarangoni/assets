@@ -1,7 +1,14 @@
 const mongoose = require('mongoose');
+//const user = mongoose.model('user', UserSchema);
+
 const Schema = mongoose.Schema;
 const AtivoSchema = new Schema(
   {
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: [true, 'Um User e necessario'],
+      ref: 'user',
+    },
     codigo: {
       type: String,
       required: [true, 'Um codigo e necessario'],
@@ -13,8 +20,27 @@ const AtivoSchema = new Schema(
     unitario: {
       type: Number,
     },
-    trades: [{        // Tambem tem Object ID
+    div_projection: [{
       type: Object,
+      timesperyear : {
+        type: Number
+      },
+      value: {
+        type:Number,
+      },
+      datestart: {
+        type:Date,
+      },
+      dateend: {
+        type:Date,
+      }
+    }],
+    trades: [{
+      type: Object,
+      trade_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: [true, 'Um codigo e necessario'],
+      },
       date:{
         type: Date,  // YYYY-MM-DD 
       },
@@ -23,6 +49,10 @@ const AtivoSchema = new Schema(
       },
       value: {
         type: Number,
+      },
+      comment: {
+        type: String,
+        max: [40, 'Sorry you reached the maximum number of characters'],
       },
     }],
   }
