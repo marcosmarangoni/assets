@@ -1,0 +1,33 @@
+<script type="text/javascript">
+
+
+
+ </script>
+
+<table style="width:80%;margin:auto;">
+    <thead>
+        <th>Código</th>
+        <th>Saldo</th>
+        <th>Unitário</th>
+        <th>Rendimento</th>
+    </thead>
+    <tbody>
+        {{#each ativos}}
+            <tr>
+                <td>{{codigo}}</td>
+                <td>{{saldo}}</td>
+                <td>{{unitario}}</td>
+                <td>{{retorno}}%</td>
+                <td>
+                    {{#each trade}}
+                        
+                    {{/each}}
+                </td>
+            </tr>
+        {{/each}}
+    </tbody>
+</table>
+ 
+ 
+
+

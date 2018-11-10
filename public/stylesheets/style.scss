@@ -27,51 +27,6 @@ html::after {
 
 /* Body Layouts */
 body {
-    position: relative;
-    z-index: 1;
-    margin: auto;
-    width: 80%;
-    height: 100%;
-    background-color: rgba(255, 255, 240, 0.8);
-    border-radius: 10px;
-}
-
-/* Navigation layouts */
-nav {
-    font-family: Oswald;
-}
-
-/* Header layouts */
-header {
-    margin-bottom: 1%;
-    img {
-        height: 40vh;
-    }
-}
-img {
-    width: 100%;
-}
-
-/* FOOTER STYLES */
-footer {
-    font: normal small-caps bold 1em/3em Oswald;
-    text-align: center;
-    background-color: ivory;
-    border-radius: 0px 0px 10px 10px;
-}
-div footer{
-    margin-top: 5px;
-}
-
-/* Form layout */
-div.user-form-container {
-    margin-left: 25%;
-    margin-bottom: 2%;
-    background-color: ivory;
-    border-radius: 10px;
-}
-form.user-form {
-    padding: 5%;
 }
 .main-page-content {
     margin: 1%;
