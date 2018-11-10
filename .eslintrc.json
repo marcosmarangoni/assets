@@ -21,6 +21,9 @@
     "rules": {
       "eqeqeq":"error",
       "quotes": ["error", "single"],
-      "no-console":"warn"
+      "no-console":"warn",
+      "no-undef":"warn",
+      "no-use-before-define":"warn",
+      "no-unused-vars": "warn"
     }
 }

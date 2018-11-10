@@ -4,30 +4,147 @@
 
  </script>
 
-<table style="width:80%;margin:auto;">
+<table id="ativosList" class="table table-striped table-bordered table-dark">
     <thead>
+        <th></th>
         <th>Código</th>
         <th>Saldo</th>
-        <th>Unitário</th>
+        <th>Unit&aacute;rio</th>
         <th>Rendimento</th>
+        <th>Op&ccedil;&otilde;es</th>
     </thead>
-    <tbody>
-        {{#each ativos}}
-            <tr>
-                <td>{{codigo}}</td>
-                <td>{{saldo}}</td>
-                <td>{{unitario}}</td>
-                <td>{{retorno}}%</td>
-                <td>
-                    {{#each trade}}
-                        
-                    {{/each}}
-                </td>
-            </tr>
-        {{/each}}
-    </tbody>
 </table>
- 
- 
+<div class="text-right" style="padding: 0px 20px 20px 0px;"><a class="btn btn-primary" role="button" href="/ativos/create">Novo</a></div>
+
+
+
+
+<!-- Modal Para Add Trade -->
+<div class="modal fade" id="TradeModal" tabindex="-1" role="dialog" aria-labelledby="Novo Trade" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Adicionar Trade</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="user-form" action="/ativos/newtrade" method="POST" id="formNewTrade" enctype="application/x-www-form-urlencoded">
+            <div class="form-group">
+                <label for="ativo">Ativo</label>
+                <input type="input" class="form-control" id="txtativo" name="ativo" disabled />
+                <input type="hidden" id="txtid" name="id" />
+            </div>
+            <div class="form-group">
+                <label for="date">Data</label>
+                <input type="date" class="form-control" id="txtdate" name="date" placeholder="Data do evento" required />
+            </div>
+            <div class="form-group">
+                <label for="quantidade">Quantidade</label>
+                <input type="number" class="form-control" id="txtquantidade" name="quantidade" placeholder="Quantidade" required />
+            </div>
+            <div class="form-group">
+                <label for="valor">Valor Total da Operacao</label>
+                <input type="number" class="form-control" id="txtvalor" name="valor" placeholder="Total Investido" required />
+            </div>
+            <div class="form-group">
+                <label for="tipo">Tipo de Operacao</label>
+                <select name="tipo" id="seltipo" class="custom-select">
+                    <option value="c" selected >Compra</option>
+                    <option value="v">Venda</option>
+                    <option value="d">Dividendo</option>
+                </select>
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" id="btntradesubmit" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Para Edit Trade -->
+<div class="modal fade" id="EditTradeModal" tabindex="-1" role="dialog" aria-labelledby="Edit Trade" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Trade</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="user-form" action="/ativos/edittrade" method="POST" id="formEditTrade" enctype="application/x-www-form-urlencoded">
+            <div class="form-group">
+                <label for="date">Data</label>
+                <input type="date" class="form-control" id="f3txtdate" name="date" placeholder="Data do evento" required />
+                <input type="hidden" id="f3txtid" name="id" />
+                <input type="hidden" id="f3txttradeid" name="tradeid" />
+            </div>
+            <div class="form-group">
+                <label for="valor">Valor Total da Operacao</label>
+                <input type="number" class="form-control" id="f3txtvalor" name="valor" placeholder="Total Investido" required />
+            </div>
+            <div class="form-group">
+                <label for="tipo">Tipo de Operacao</label>
+                <select name="tipo" id="f3seltipo" class="custom-select">
+                    <option value="c" selected >Compra</option>
+                    <option value="v">Venda</option>
+                    <option value="d">Dividendo</option>
+                </select>
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" id="btnedittradesubmit" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Para Opcoes -->
+<div class="modal fade" id="OptionsModal" tabindex="-1" role="dialog" aria-labelledby="Editar Ativo" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Ativo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="user-form" action="/ativos/edit" method="POST" id="formEditAtivo" enctype="application/x-www-form-urlencoded">
+            <div class="form-group">
+                <label for="ativo">Ativo</label>
+                <input type="input" class="form-control" id="f2txtativo" name="ativo" required />
+                <input type="hidden" id="f2txtid" name="id" />
+            </div>
+            <div class="form-group">
+                <label for="quantidade">Saldo Atual</label>
+                <input type="number" class="form-control" id="f2txtsaldo" name="saldo" required />
+            </div>
+            <div class="form-group">
+                <label for="valor">Unit&atilde;rio</label>
+                <input type="number" class="form-control" id="f2txtunitario" name="unitario"  required />
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" id="btnopcoessubmit" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<script src="/javascripts/ativos.js"></script>
 
 
