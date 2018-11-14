@@ -1,36 +1,20 @@
-let IRR = require('../resources/irr');
+let YReturn = require('../services/yreturn');
 const Ativo = require('../models/ativo');
 let mongoose = require('mongoose');
 const async = require('async');
 
 // Temporary:
 const User = require('../models/user');
-//let user;
-//let user;
-/*
-const user = async () => {
-    return await User.find({username: "cesar.reboucas@gmail.com"})
-};
-user().then(users => {
-    //console.log(users);
-})
-*/
-
-async function getUser(username) {
-    
-    //let user = await User.find({username: username});
-    let user = await User.find();
-    //console.log(user);
-    return user;
-    //response.return(user);
-}
-//getUser("aaa");
-//console.log(getUser("cesar.reboucas@gmail.com"));
-//getUser("cesar.reboucas@gmail.com").then(a);
-
-//then(console.log);
-//Fake User_ID:
-//const user = { _id : "5be5d8d44c07401ce455de9d"};
+let user;
+async.waterfall([
+    function(cb) {
+        User.findOne({email:"marcosmarangoni2@gmail.com"}).select('first_name').lean().exec(cb);;
+        
+    }],
+    function (err, results) {
+        if(err) {console.log(err);}
+        user = results;
+});
 
 /************************************************************
  * 
@@ -48,18 +32,21 @@ async function index(request, response) {
  * @param {Response} response 
  */
 async function indexList(request, response) {
-    
-    let Ativos = await Ativo.find();
+    let TotalAtivos = { trades:new Array() };
+    let Ativos = await Ativo.find({user_id: user._id}).sort('codigo').collation({locale: "en", strength: 1});
+    let patrimonio, patriminioTotal=0;
     for(let x = 0; x < Ativos.length ; ++x) {
-        Ativos[x].set('retorno', IRR.calc(Ativos[x]), { strict: false });
+        patrimonio = Number(Ativos[x].unitario * Ativos[x].saldo)
+        Ativos[x].set('retorno', YReturn.calc(Ativos[x].trades, patrimonio), { strict: false });
+        Ativos[x].set('patrimonio', patrimonio, { strict: false });
+        Array.prototype.push.apply(TotalAtivos.trades,Ativos[x].trades); 
+        patriminioTotal += patrimonio;
     }
-
-    let Users = await User.find();
-    console.log(Ativos[0]);
+    TotalAtivos.retorno = YReturn.calc(TotalAtivos.trades, 0);
+    TotalAtivos.patrimonio = patriminioTotal;
+    delete TotalAtivos.trades;
+    response.send({AtivosTable : Ativos, TotalAtivos: TotalAtivos});
     
-
-
-    response.send(Ativos);
 }
 
 /************************************************************
@@ -161,7 +148,7 @@ async function editTrade(request, response) {
 async function editAtivo(request, response) {
 
 
-    ativo = await Ativo.findOneAndUpdate({_id: request.body.id, user_id:user._id}, { 
+    ativo = await Ativo.findOneAndUpdate({_id: request.body.id}, { 
         $set: {
             codigo: request.body.ativo,
             saldo: Number(request.body.saldo),
@@ -169,26 +156,11 @@ async function editAtivo(request, response) {
         }
     });
     console.log(ativo)
-    console.log(JSON.stringify({_id: request.body.id, user_id:user._id}));
+    console.log(JSON.stringify({_id: request.body.id}));
     response.redirect('/ativos');
 }
 
-async.waterfall([
-    function(cb) {
-        console.log("Exec I");
-        User.find({},cb);
-        
-    },
-    function(cb2) {
-        //setTimeout(function(){ console.log("Espera_Ended"); }, 3000,cb2);
-        console.log("Exec II",cb2);
-    },
-    function(cb3) {
-        console.log("Exec III",cb3);
-    }   
-],  function (results) {
-        console.log(JSON.stringify(results));
-});
+
 
 
 
