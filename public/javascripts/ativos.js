@@ -38,10 +38,8 @@ function formatTable ( d ) {
     return t;
 }
 
+// Edit Trade
 function fillEditTradeModal(objid, tradeid, date, value, tipo) {
-    //tradeObj = JSON.parse(trade);
-
-    alert('OBJ:'+objid+' Trade:'+tradeid);
     $('#f3txtid').val(objid);
     $('#f3txttradeid').val(tradeid);
     $('#f3txttradeid').val(tradeid);
@@ -75,7 +73,7 @@ $(document).ready(function() {
     }});
     
 
-    $('#ativosList').DataTable({
+    let ativosList = $('#ativosList').DataTable({
         data: results.AtivosTable,
         /*ajax: {
             url: '/ativos',
@@ -143,31 +141,53 @@ $(document).ready(function() {
         }
     });
 
+    // Opcoes
     $('#ativosList tbody').on('click', '#btnopcoes', function () {
         $('#OptionsModal').modal('show');
         $('#f2txtativo').val(ativosList.row( $(this).parents('tr') ).data().codigo);
         $('#f2txtid').val(ativosList.row( $(this).parents('tr') ).data()._id);
         $('#f2txtsaldo').val(ativosList.row( $(this).parents('tr') ).data().saldo);
         $('#f2txtunitario').val(ativosList.row( $(this).parents('tr') ).data().unitario);
+        $('#f2txtguess').val(ativosList.row( $(this).parents('tr') ).data().retorno);
+        //alert(ativosList.row( $(this).parents('tr') ).data().retorno);
     });
 
-    $('#btnopcoessubmit').click(function() {
-        //alert( $('#txtid').val() );
-        $('#formEditAtivo').submit();
-    });
-
+    // Add Trade
     $('#ativosList tbody').on('click', '#btnaddtrade', function () {
         $('#TradeModal').modal('show');
         $('#txtativo').val(ativosList.row( $(this).parents('tr') ).data().codigo);
         $('#txtid').val(ativosList.row( $(this).parents('tr') ).data()._id);
     });
 
+    //Add Trade
     $('#btntradesubmit').click(function() {
+        if($('#txtdate').val().length < 4) { return throwError($('#txtdate'));}
+        if( $('#txtvalor').val() == "" ||  Number($('#txtvalor').val()) == 0 ) {
+            return throwError($('#txtvalor'));}
         $('#formNewTrade').submit();
     });
 
+    // Edit Trade
     $('#btnedittradesubmit').click(function() {
+        if($('#f3txtdate').val().length < 4) { return throwError($('#f3txtdate'));}
+        if( $('#f3txtvalor').val() == "" ||  Number($('#f3txtvalor').val()) == 0 ) {
+            return throwError($('#f3txtvalor'));}
         $('#formEditTrade').submit();
     });
 
+    // Opcoes
+    $('#btnopcoessubmit').click(function() {
+        if($('#f2txtativo').val().length < 2) { return throwError($('#f2txtativo'));}
+        if( $('#f2txtsaldo').val() == "") {
+            return throwError($('#f2txtsaldo'));}
+        if( $('#f2txtunitario').val() == "" ||  Number($('#f2txtunitario').val()) == 0 ) {
+            return throwError($('#f2txtunitario'));}
+        $('#formEditAtivo').submit();
+    });
+
 });
+
+function throwError(obj) {
+    obj.addClass("is-invalid");
+    return false;
+}

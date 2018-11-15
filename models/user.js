@@ -47,6 +47,12 @@ const UserSchema = new Schema(
       random_token: {
           type: String,
       },
+      stats: {
+          type: Object,
+          assetamt: { type: Number },
+          return: { type: Number },
+          goalEnd: { type: Date }
+      }
     }
 );
 

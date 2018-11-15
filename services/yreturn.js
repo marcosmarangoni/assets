@@ -1,6 +1,7 @@
 /** irr.js **/
 
-    function calc(trades, atual) {
+    function calc(trades, atual, guess) {
+        //console.log(guess);
         let date; // to be used as the trade date
         let tempNow = new Date();
         let now = new Date(tempNow.getFullYear(), tempNow.getMonth(), tempNow.getDate(),0,0,0,0);
@@ -32,21 +33,24 @@
         //console.log(ativo)
 
         if(trades.length>2) {
-            return irr(trades);
+            return irr(trades,guess);
         } else {
             return simpleReturn(trades);
         }
     }
 
-    function irr(fluxo) {
-        var sum_in = 0;
-        var sum_out = 0;
+    function irr(fluxo,_guess) {
+        let sum_in = 0, sum_out = 0, guess;
 
         for (i = 0; i < fluxo.length; ++i) {
             if(fluxo[i].value > 0) {sum_in += fluxo[i].value;} else {sum_out -= fluxo[i].value;}
         }
-        
-        var guess = (sum_in/sum_out);
+
+        if(isNaN(_guess)) { guess = (sum_in/sum_out); }
+        else {guess = (_guess/100)+1;}
+        console.log('GUESS: '+guess);
+
+
         var i=1;
         var vp_second = 0;
         var guess_second = 0;

@@ -2,9 +2,10 @@ let YReturn = require('../services/yreturn');
 const Ativo = require('../models/ativo');
 let mongoose = require('mongoose');
 const async = require('async');
+const User = require('../models/user');
 
 // Temporary:
-const User = require('../models/user');
+
 let user;
 async.waterfall([
     function(cb) {
@@ -37,7 +38,7 @@ async function indexList(request, response) {
     let patrimonio, patriminioTotal=0;
     for(let x = 0; x < Ativos.length ; ++x) {
         patrimonio = Number(Ativos[x].unitario * Ativos[x].saldo)
-        Ativos[x].set('retorno', YReturn.calc(Ativos[x].trades, patrimonio), { strict: false });
+        Ativos[x].set('retorno', YReturn.calc(Ativos[x].trades, patrimonio, Ativos[x].guess), { strict: false });
         Ativos[x].set('patrimonio', patrimonio, { strict: false });
         Array.prototype.push.apply(TotalAtivos.trades,Ativos[x].trades); 
         patriminioTotal += patrimonio;
@@ -45,6 +46,10 @@ async function indexList(request, response) {
     TotalAtivos.retorno = YReturn.calc(TotalAtivos.trades, 0);
     TotalAtivos.patrimonio = patriminioTotal;
     delete TotalAtivos.trades;
+
+    await User.findOneAndUpdate({_id: user._id}, 
+        {"stats.assetamt": TotalAtivos.patrimonio, "stats.return": TotalAtivos.retorno}); 
+
     response.send({AtivosTable : Ativos, TotalAtivos: TotalAtivos});
     
 }
@@ -110,12 +115,9 @@ async function createTrade(request, response) {
         tipo:request.body.tipo,
         value:Number(request.body.valor)
     };
-
-    //await console.log(mongoose.Types.ObjectId());
-    //await console.log(novotrade);
+    
     ativo = await Ativo.findOneAndUpdate({_id: id}, {$push: {trades: novotrade}});
-    //await console.log("ID*************"+id);
-            
+
     response.redirect('/ativos');
 }
 
@@ -153,10 +155,10 @@ async function editAtivo(request, response) {
             codigo: request.body.ativo,
             saldo: Number(request.body.saldo),
             unitario: Number(request.body.unitario),
+            guess: Number(request.body.guess),
         }
     });
-    console.log(ativo)
-    console.log(JSON.stringify({_id: request.body.id}));
+    
     response.redirect('/ativos');
 }
 
