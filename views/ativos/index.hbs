@@ -23,7 +23,20 @@
       </tr>
     </tfoot>
 </table>
-<div class="text-right" style="padding: 0px 20px 20px 0px;"><a class="btn btn-primary" role="button" href="/ativos/create">Novo</a></div>
+<div class="text-right" style="padding: 0px 20px 20px 0px;">
+  <a class="btn btn-primary" data-toggle="collapse" href="#divGraph" role="button">Ver Gr&aacute;fico</a>
+  <a class="btn btn-primary" role="button" href="/ativos/create">Novo</a>
+</div>
+
+
+
+  
+    
+  
+
+<div class="collapse show" id="divGraph" width="400" height="400">
+  <canvas id="AtivoChart" ></canvas>
+</div>
 
 
 
@@ -154,7 +167,7 @@
 
 
 
-
+<script src="/javascripts/Chart.min.js"></script>
 <script src="/javascripts/ativos.js"></script>
 
 

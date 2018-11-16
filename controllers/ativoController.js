@@ -9,8 +9,7 @@ const User = require('../models/user');
 let user;
 async.waterfall([
     function(cb) {
-        User.findOne({email:"marcosmarangoni2@gmail.com"}).select('first_name').lean().exec(cb);;
-        
+        User.findOne({email:"marcosmarangoni2@gmail.com"}).select({"first_name":1, "stats.return":1 }).lean().exec(cb);
     }],
     function (err, results) {
         if(err) {console.log(err);}
@@ -43,13 +42,13 @@ async function indexList(request, response) {
         Array.prototype.push.apply(TotalAtivos.trades,Ativos[x].trades); 
         patriminioTotal += patrimonio;
     }
-    TotalAtivos.retorno = YReturn.calc(TotalAtivos.trades, 0);
+    TotalAtivos.retorno = YReturn.calc(TotalAtivos.trades, 0, user.stats.return);
     TotalAtivos.patrimonio = patriminioTotal;
     delete TotalAtivos.trades;
 
     await User.findOneAndUpdate({_id: user._id}, 
         {"stats.assetamt": TotalAtivos.patrimonio, "stats.return": TotalAtivos.retorno}); 
-
+    //console.log(user);
     response.send({AtivosTable : Ativos, TotalAtivos: TotalAtivos});
     
 }
@@ -76,7 +75,7 @@ async function createAtivo(request, response) {
             break;
     }
     const ativoParams = {
-        user_id: user.id,
+        user_id: user._id,
         codigo: request.body.codigo,
         saldo: request.body.quantidade,
         unitario: unit,
@@ -92,7 +91,6 @@ async function createAtivo(request, response) {
     const ativo = new Ativo(ativoParams);
     try {
         await ativo.save();
-        //response.send("Deu certo");
         response.redirect('/ativos');
     } catch (error) {
         response.send({ error: true, errors: error.errors })
@@ -136,7 +134,6 @@ async function editTrade(request, response) {
         value:Number(request.body.valor)
     };
 
-    //await console.log('Trade: ' +id+ ' Trade_ID: '+tradeid  );
     await Ativo.findOneAndUpdate({_id: id, "trades.trade_id": mongoose.Types.ObjectId(tradeid)}, {$set: { "trades.$":editedtrade }});
     
     response.redirect('/ativos');
@@ -161,11 +158,6 @@ async function editAtivo(request, response) {
     
     response.redirect('/ativos');
 }
-
-
-
-
-
 
 
 module.exports = {

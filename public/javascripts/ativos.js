@@ -1,4 +1,5 @@
 
+
 /* Formatting function for row details - modify as you need */
 function formatTable ( d ) {
     // d is the original data object for the row
@@ -71,15 +72,10 @@ $(document).ready(function() {
     $.ajax({url: "/ativos", type: "POST", async: false ,  success: function(result){
         results = result;
     }});
-    
 
     let ativosList = $('#ativosList').DataTable({
         data: results.AtivosTable,
-        /*ajax: {
-            url: '/ativos',
-            type: 'post',
-            dataSrc: 'AtivosTable'
-        },*/
+        paging: false,  
         columns: [
             {
                 className: 'details-control',
@@ -125,6 +121,55 @@ $(document).ready(function() {
 
         }
     });
+
+    
+    let dataChart = {
+        labels: new Array(), 
+        datasets:[{
+            label: "DataSet", 
+            data: new Array(),
+            backgroundColor: new Array(),
+        }]
+    };
+
+    let colors = ["#FF6666", "#FFB266", "#FFFF66", "#B2FF66", "#66FF66", "#66FFB2", "#66FFFF", "#66B2FF", "#6666FF", "#B266FF",
+        "#FF66FF", "#FF66B2", "#C0C0C0"];
+    results.AtivosTable.forEach(element => {
+        console.log(element);
+        dataChart.labels.push(element.codigo);
+        dataChart.datasets[0].data.push(Number(element.patrimonio.toFixed(2)));
+        dataChart.datasets[0].backgroundColor.push(colors[Math.trunc(Math.random()*13)]);
+    });
+    //console.log(dataChart);
+
+    var AtivoChart = new Chart(document.getElementById("AtivoChart"),{
+        type:"doughnut",
+        data: dataChart,
+        options: {
+            "animation.animateRotate":false,
+            legend: {
+                position: 'right',
+                labels: {
+                    fontSize:18,
+                    boxWidth: 80
+                }
+            },
+            tooltips: {
+                callbacks: {
+                  label: function(tooltipItem, data) {
+                    var dataset = data.datasets[tooltipItem.datasetIndex];
+                    var total = dataset.data.reduce(function(previousValue, currentValue, currentIndex, array) {
+                      return previousValue + currentValue;
+                    });
+                    var currentValue = dataset.data[tooltipItem.index];
+                    var percentage = ((currentValue/total) * 100);
+                    return percentage.toFixed(2) + "%";
+                  }
+                }
+              }
+        }
+    });
+    
 
     // Add event listener for opening and closing details
     $('#ativosList tbody').on('click', 'td.details-control', function () {
