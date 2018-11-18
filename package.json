@@ -8,6 +8,7 @@
     "debug": "nodemon --inspect ./bin/www"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.5.0",
     "async": "^2.6.1",
     "body-parser": "^1.18.3",
     "bootstrap": "^4.1.3",

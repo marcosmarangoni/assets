@@ -1,19 +1,29 @@
-@import "bootstrap/scss/bootstrap";
-@import 'font-awesome/scss/solid.scss';
-@import 'font-awesome/scss/fontawesome.scss';
+//@import "bootstrap/scss/bootstrap";
+//@import 'font-awesome/scss/solid.scss';
+//@import 'font-awesome/scss/fontawesome.scss';
 // @import 'datatable/DataTables-1.10.18/css/dataTables.bootstrap4.css';
 
-@import url('font-awesome/webfonts/fa-solid-900.eot');
-@import url('font-awesome/webfonts/fa-solid-900.svg');
-@import url('font-awesome/webfonts/fa-solid-900.ttf');
-@import url('font-awesome/webfonts/fa-solid-900.woff');
-@import url('font-awesome/webfonts/fa-solid-900.woff2');
+$theme-colors: (
+  "primary": #444444,
+  "danger": #ff4136
+);
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+//$fa-font-path:    "../node_modules/font-awesome/fonts";
+
+
+$fa-font-path: "webfonts";
+@import "../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
+@import "../../node_modules/@fortawesome/fontawesome-free/scss/solid";
+//@import url('../../node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2');
+@import url('webfonts/fa-solid-900.woff2');
+@import url('webfonts/fa-solid-900.woff');
 
 @import url('https://fonts.googleapis.com/css?family=Oswald');
 
 /* Html Layouts */
 html {
-    background: url(/images/html_background.jpeg) no-repeat center center fixed;
+    background: url(/images/bg.jpg) no-repeat center center fixed;
 }
 html::after {
     content: "";
@@ -22,7 +32,7 @@ html::after {
     height: 100%;
     top: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.445);
+    
 }
 
 /* Body Layouts */
@@ -30,10 +40,8 @@ body {
     position: relative;
     z-index: 1;
     margin: auto;
-    width: 80%;
-    height: 100%;
-    background-color: rgba(255, 255, 240, 0.8);
-    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.0);
+    /*border-radius: 10px;*/
 }
 
 /* Navigation layouts */
@@ -42,25 +50,18 @@ nav {
 }
 
 /* Header layouts */
-header {
-    margin-bottom: 1%;
-    img {
-        height: 40vh;
-    }
-}
+
 img {
     width: 100%;
+    display: block;
 }
 
 /* FOOTER STYLES */
 footer {
     font: normal small-caps bold 1em/3em Oswald;
     text-align: center;
-    background-color: ivory;
-    border-radius: 0px 0px 10px 10px;
-}
-div footer{
-    margin-top: 5px;
+    background-color: black;
+    color: #eb591f;
 }
 
 /* Form layout */

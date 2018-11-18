@@ -12,34 +12,47 @@
 
 <body>
     <header>
-        <img src="/images/header_background.jpg" alt="">
-    </header>
-    <div class="container">
-        <div class="row">
-            <div class="offset-5">
-                <nav>
-                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="pills-home-tab" href="/" role="tab">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="pills-home-tab" href="/users" role="tab">Users</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="pills-profile-tab" href="/ativos" role="tab">Ativos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="pills-contact-tab" href="/goals" role="tab"><i class="fas fa-chart-bar"></i> Metas</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#" style="margin-left:10%;">
+            <img src="/images/assets.svg" style="width: 64px ;height:64px">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" id="pills-home-tab" href="/" role="tab">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-home-tab" href="/users" role="tab">Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-profile-tab" href="/ativos" role="tab">Ativos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-contact-tab" href="/goals" role="tab"><i class="fas fa-chart-bar"></i> Metas</a>
+                </li>
+            </ul>
+            <span class="navbar-text">
+                Navbar text with an inline element
+            </span>
         </div>
-    </div>
-    {{{body}}}
-    <footer>
-        &copy
-        Marcos Marangoni & Cesar</a>
-    </footer>
-</body>
+    </nav> 
+    </header>
+    
+
+
+    <div style="width: 90%; margin: auto; background-color: rgba(0,0,0,0.5);">{{{body}}}</div>
+
+    
+        
+            <footer class="bg-dark">
+            &copy
+            Marcos Marangoni & Cesar</a>
+        </footer>
+        
+    
+</body>    
+
 </html>
