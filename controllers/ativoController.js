@@ -9,12 +9,15 @@ const User = require('../models/user');
 let user;
 async.waterfall([
     function(cb) {
-        User.findOne({email:"marcosmarangoni2@gmail.com"}).select({"first_name":1, "stats.return":1 }).lean().exec(cb);
+        //User.findOne({email:"marcosmarangoni2@gmail.com"}).select({"first_name":1, "stats.return":1 }).lean().exec(cb);
     }],
     function (err, results) {
         if(err) {console.log(err);}
         user = results;
 });
+
+user = {_id : "5be17559311d5c0fb0f42d1d", stats: {return: 15 }};
+
 
 /************************************************************
  * 
@@ -153,6 +156,8 @@ async function editAtivo(request, response) {
             saldo: Number(request.body.saldo),
             unitario: Number(request.body.unitario),
             guess: Number(request.body.guess),
+            class: { c1: request.body.class_1 , c2: request.body.class_2, c3: request.body.class_3 },
+
         }
     });
     

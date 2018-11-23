@@ -14,13 +14,19 @@ const AtivoSchema = new Schema(
     saldo:    {type: Number },
     unitario: {type: Number },
     guess:    { type: Number },
-    div_projection: [{
+    /*div_projection: [{
       type: Object,
       timesperyear : { type: Number },
       value: { type:Number },
       datestart: { type:Date },
       dateend: { type:Date }
-    }],
+    }],*/
+    class :{
+      type: Object,
+      c1: {type: String},
+      c2: {type: String},
+      c3: {type: String},
+    },
     trades: [{
       type: Object,
       trade_id: { type: mongoose.Schema.Types.ObjectId, required: [true, 'Um codigo e necessario'] },

@@ -50,16 +50,9 @@ function fillEditTradeModal(objid, tradeid, date, value, tipo) {
     $('#EditTradeModal').modal('show');
 }
 
- 
-
-
 function formatDate(date) {
-    var monthNames = [ "",
-      "Jan", "Fev", "Mar",
-      "Abr", "Mai", "Jun",
-      "Jul", "Ago", "Set",
-      "Out","Nov", "Dez"
-    ];
+    var monthNames = [ "", "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+      "Jul", "Ago", "Set", "Out","Nov", "Dez"];
   
     var day = date.getDate();
     var monthNum = (date.getMonth()+1);
@@ -67,15 +60,46 @@ function formatDate(date) {
   
     return ('0'+day).slice(-2) + '-' + monthNames[monthNum] + '-' + year;
 }
+
 $(document).ready(function() {
     let results;
     $.ajax({url: "/ativos", type: "POST", async: false ,  success: function(result){
         results = result;
     }});
-
+    
+    // Fazendo Datalist das Classificacoes
+    datalist_1 = document.getElementById("dl_class1")
+    datalist_2 = document.getElementById("dl_class2")
+    datalist_3 = document.getElementById("dl_class3")
+    usedClass = [[],[],[]];
+    results.AtivosTable.forEach(
+        function(element) {
+            try {
+                if (!usedClass[0].includes(element.class.c1)) {
+                    datalist_1.insertAdjacentHTML('beforeend',  '<option value="'+element.class.c1+'" />');
+                    usedClass[0].push(element.class.c1);
+                } 
+                if (!usedClass[1].includes(element.class.c2)) {
+                    datalist_2.insertAdjacentHTML('beforeend',  '<option value="'+element.class.c2+'" />');
+                    usedClass[1].push(element.class.c2);
+                } 
+                if (!usedClass[2].includes(element.class.c3)) {
+                    datalist_3.insertAdjacentHTML('beforeend',  '<option value="'+element.class.c3+'" />');
+                    usedClass[2].push(element.class.c3);
+                } 
+            } catch {}
+      });
+      
+    
+    
+// ************** Start of Table - DataTable *****************
     let ativosList = $('#ativosList').DataTable({
         data: results.AtivosTable,
-        paging: false,  
+        paging: false, 
+        info: false,
+        language: {
+            search: "Localizar: ",
+        },
         columns: [
             {
                 className: 'details-control',
@@ -121,58 +145,54 @@ $(document).ready(function() {
 
         }
     });
+    $('.dataTables_filter label').css( "color", "white" );
+    // ************** End of Table - DataTable *****************
 
     
     let dataChart = {
         labels: new Array(), 
-        datasets:[{
-            label: "DataSet", 
-            data: new Array(),
-            backgroundColor: new Array(),
-        }]
+        datasets:[{ data: new Array(), backgroundColor: new Array() }]
+    };
+    let Class01dataChart = {
+        labels: ["Indefinido"], 
+        datasets:[{ data: [0], backgroundColor: [0] }]
     };
 
-    let colors = ["#FF6666", "#FFB266", "#FFFF66", "#B2FF66", "#66FF66", "#66FFB2", "#66FFFF", "#66B2FF", "#6666FF", "#B266FF",
+
+
+    let colors = ["#FF6666", "#FFB266", "#FFFF66", "#66FF66", "#66FFFF", "#66B2FF", "#6666FF", "#B266FF",
         "#FF66FF", "#FF66B2", "#C0C0C0"];
+    let ci = 0;
+    let position = 0;
     results.AtivosTable.forEach(element => {
-        console.log(element);
         dataChart.labels.push(element.codigo);
         dataChart.datasets[0].data.push(Number(element.patrimonio.toFixed(2)));
-        dataChart.datasets[0].backgroundColor.push(colors[Math.trunc(Math.random()*13)]);
-    });
-    //console.log(dataChart);
-
-    var AtivoChart = new Chart(document.getElementById("AtivoChart"),{
-        type:"doughnut",
-        data: dataChart,
-        options: {
-            "animation.animateRotate":false,
-            legend: {
-                position: 'right',
-                labels: {
-                    fontSize:18,
-                    boxWidth: 80
-                }
-            },
-            tooltips: {
-                callbacks: {
-                  label: function(tooltipItem, data) {
-                    var dataset = data.datasets[tooltipItem.datasetIndex];
-                    var total = dataset.data.reduce(function(previousValue, currentValue, currentIndex, array) {
-                      return previousValue + currentValue;
-                    });
-                    var currentValue = dataset.data[tooltipItem.index];
-                    var percentage = ((currentValue/total) * 100);
-                    return percentage.toFixed(2) + "%";
-                  }
-                }
-              }
-        }
-    });
+        dataChart.datasets[0].backgroundColor.push(colors[ci%10]);
     
+        console.log(element.codigo+" - "+element.class.c1+" - "+Number(element.patrimonio.toFixed(2)));
+
+        if(element.class.c1=="") {
+            console.log("Indefinido: "+element.codigo+" Pat: "+Number(element.patrimonio.toFixed(2)));
+            Class01dataChart.datasets[0].data[0] += Number(element.patrimonio.toFixed(2));
+            Class01dataChart.datasets[0].backgroundColor[0] = colors[0];
+        } else if(Class01dataChart.labels.includes(element.class.c1)) {
+                console.log(element.codigo+": Adicionando Existente")
+                position = Class01dataChart.labels.indexOf(element.class.c1);
+                Class01dataChart.datasets[0].data[position] += Number(element.patrimonio.toFixed(2));
+        } else {
+            console.log(element.codigo+": Pushing")
+                Class01dataChart.labels.push(element.class.c1);
+                Class01dataChart.datasets[0].data.push(Number(element.patrimonio.toFixed(2)));
+                Class01dataChart.datasets[0].backgroundColor.push(colors[Class01dataChart.datasets[0].backgroundColor.length]);
+        }
+        ++ci;
+    });
+
+    var AtivoChart = generateNewChart("AtivoChart", dataChart);
+    var Class01Chart = generateNewChart("Class01Chart",Class01dataChart);
 
     // Add event listener for opening and closing details
-    $('#ativosList tbody').on('click', 'td.details-control', function () {
+    $('#ativosList tbody').on('click', 'td.details-control', function() {
         var tr = $(this).closest('tr');
         var row = ativosList.row( tr );
  
@@ -186,7 +206,7 @@ $(document).ready(function() {
         }
     });
 
-    // Opcoes
+    // Filling modal Opcoes
     $('#ativosList tbody').on('click', '#btnopcoes', function () {
         $('#OptionsModal').modal('show');
         $('#f2txtativo').val(ativosList.row( $(this).parents('tr') ).data().codigo);
@@ -194,17 +214,21 @@ $(document).ready(function() {
         $('#f2txtsaldo').val(ativosList.row( $(this).parents('tr') ).data().saldo);
         $('#f2txtunitario').val(ativosList.row( $(this).parents('tr') ).data().unitario);
         $('#f2txtguess').val(ativosList.row( $(this).parents('tr') ).data().retorno);
-        //alert(ativosList.row( $(this).parents('tr') ).data().retorno);
+        $('#f2txtclass01').val(ativosList.row( $(this).parents('tr') ).data().class.c1);
+        $('#f2txtclass02').val(ativosList.row( $(this).parents('tr') ).data().class.c2);
+        $('#f2txtclass03').val(ativosList.row( $(this).parents('tr') ).data().class.c3);
+        
+        
     });
 
-    // Add Trade
+    // Filling modal Add Trade
     $('#ativosList tbody').on('click', '#btnaddtrade', function () {
         $('#TradeModal').modal('show');
         $('#txtativo').val(ativosList.row( $(this).parents('tr') ).data().codigo);
         $('#txtid').val(ativosList.row( $(this).parents('tr') ).data()._id);
     });
 
-    //Add Trade
+    //Submiting Add Trade
     $('#btntradesubmit').click(function() {
         if($('#txtdate').val().length < 4) { return throwError($('#txtdate'));}
         if( $('#txtvalor').val() == "" ||  Number($('#txtvalor').val()) == 0 ) {
@@ -231,6 +255,39 @@ $(document).ready(function() {
     });
 
 });
+
+function generateNewChart(element, data) {
+
+    return new Chart(document.getElementById(element),{
+        type:"doughnut",
+        data: data,
+        options: {
+            "animation.animateRotate":false,
+            legend: {
+                position: 'right',
+                labels: {
+                    fontSize:18,
+                    boxWidth: 80,
+                    fontColor:'#ffffff',
+                }
+            },
+            tooltips: {
+                callbacks: {
+                  label: function(tooltipItem, data) {
+                    var dataset = data.datasets[tooltipItem.datasetIndex];
+                    var total = dataset.data.reduce(function(previousValue, currentValue, currentIndex, array) {
+                      return previousValue + currentValue;
+                    });
+                    var currentValue = dataset.data[tooltipItem.index];
+                    var percentage = ((currentValue/total) * 100);
+                    return percentage.toFixed(2) + "%";
+                  }
+                }
+            }
+        }
+    });
+
+}
 
 function throwError(obj) {
     obj.addClass("is-invalid");
