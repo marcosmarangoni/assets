@@ -29,11 +29,23 @@
     <a class="btn btn-primary" data-toggle="collapse" href="#divGraph" role="button">Ver Gr&aacute;fico</a>
     <a class="btn btn-primary" role="button" href="/ativos/create">Novo</a>
   </div>
-  <div class="collapse show" id="divGraph" style="width:800px; margin:auto;">
-    <canvas id="AtivoChart" ></canvas>
-    <canvas id="Class01Chart" ></canvas>
-    <canvas id="Class02Chart" ></canvas>
-    <canvas id="Class03Chart" ></canvas>
+  <div class="collapse show " id="divGraph" style="width:800px; margin:auto;">
+    <div class="row">
+      <div class="col">
+        <canvas id="AtivoChart"></canvas>
+      </div>
+      <div class="col">
+        <canvas id="Class01Chart"></canvas>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <canvas id="Class02Chart"></canvas>
+      </div>
+      <div class="col">
+        <canvas id="Class03Chart"></canvas>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -107,16 +119,21 @@
                 <input type="hidden" id="f3txttradeid" name="tradeid" />
             </div>
             <div class="form-group">
-                <label for="valor">Valor Total da Operacao</label>
+                <label for="f3txtvalor">Valor Total da Operacao</label>
                 <input type="number" class="form-control" id="f3txtvalor" name="valor" placeholder="Total Investido" required />
             </div>
             <div class="form-group">
-                <label for="tipo">Tipo de Operacao</label>
+                <label for="f3seltipo">Tipo de Operacao</label>
                 <select name="tipo" id="f3seltipo" class="custom-select">
                     <option value="c" selected >Compra</option>
                     <option value="v">Venda</option>
                     <option value="d">Dividendo</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="f3remove" name="remove">
+                <label for="f3remove">Remover trade</label>
+                
             </div>
         </form>
       </div>

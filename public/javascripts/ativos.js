@@ -1,5 +1,4 @@
-
-
+"use strict";
 /* Formatting function for row details - modify as you need */
 function formatTable ( d ) {
     // d is the original data object for the row
@@ -25,8 +24,8 @@ function formatTable ( d ) {
         }
         console.log(element.date);
         let tempdata = element.date.split('T');
-        dateArray = tempdata[0].split('-');
-        date = new Date(dateArray[0],(dateArray[1]-1),dateArray[2],0,0,0,0);
+        let dateArray = tempdata[0].split('-');
+        let date = new Date(dateArray[0],(dateArray[1]-1),dateArray[2],0,0,0,0);
         t += '<tr><td>'+tipo+'</td>'+            
                     '<td class="text-right">'+formatDate(date)+'</td>\
                     <td class="text-right">'+Number(element.value).toFixed(2)+'</td>\
@@ -68,10 +67,10 @@ $(document).ready(function() {
     }});
     
     // Fazendo Datalist das Classificacoes
-    datalist_1 = document.getElementById("dl_class1")
-    datalist_2 = document.getElementById("dl_class2")
-    datalist_3 = document.getElementById("dl_class3")
-    usedClass = [[],[],[]];
+    let datalist_1 = document.getElementById("dl_class1");
+    let datalist_2 = document.getElementById("dl_class2");
+    let datalist_3 = document.getElementById("dl_class3");
+    let usedClass = [[],[],[]];
     results.AtivosTable.forEach(
         function(element) {
             try {
@@ -90,8 +89,6 @@ $(document).ready(function() {
             } catch {}
       });
       
-    
-    
 // ************** Start of Table - DataTable *****************
     let ativosList = $('#ativosList').DataTable({
         data: results.AtivosTable,
@@ -153,17 +150,12 @@ $(document).ready(function() {
         labels: new Array(), 
         datasets:[{ data: new Array(), backgroundColor: new Array() }]
     };
-    let Class01dataChart = {
-        labels: ["Indefinido"], 
-        datasets:[{ data: [0], backgroundColor: [0] }]
-    };
 
 
 
-    let colors = ["#FF6666", "#FFB266", "#FFFF66", "#66FF66", "#66FFFF", "#66B2FF", "#6666FF", "#B266FF",
-        "#FF66FF", "#FF66B2", "#C0C0C0"];
+    
     let ci = 0;
-    let position = 0;
+    
     results.AtivosTable.forEach(element => {
         dataChart.labels.push(element.codigo);
         dataChart.datasets[0].data.push(Number(element.patrimonio.toFixed(2)));
@@ -171,25 +163,18 @@ $(document).ready(function() {
     
         console.log(element.codigo+" - "+element.class.c1+" - "+Number(element.patrimonio.toFixed(2)));
 
-        if(element.class.c1=="") {
-            console.log("Indefinido: "+element.codigo+" Pat: "+Number(element.patrimonio.toFixed(2)));
-            Class01dataChart.datasets[0].data[0] += Number(element.patrimonio.toFixed(2));
-            Class01dataChart.datasets[0].backgroundColor[0] = colors[0];
-        } else if(Class01dataChart.labels.includes(element.class.c1)) {
-                console.log(element.codigo+": Adicionando Existente")
-                position = Class01dataChart.labels.indexOf(element.class.c1);
-                Class01dataChart.datasets[0].data[position] += Number(element.patrimonio.toFixed(2));
-        } else {
-            console.log(element.codigo+": Pushing")
-                Class01dataChart.labels.push(element.class.c1);
-                Class01dataChart.datasets[0].data.push(Number(element.patrimonio.toFixed(2)));
-                Class01dataChart.datasets[0].backgroundColor.push(colors[Class01dataChart.datasets[0].backgroundColor.length]);
-        }
+        Class01dataChart = addItemsToGraph(Class01dataChart, element.class.c1, element.patrimonio, element.codigo);
+        Class02dataChart = addItemsToGraph(Class02dataChart, element.class.c2, element.patrimonio, element.codigo);
+        Class03dataChart = addItemsToGraph(Class03dataChart, element.class.c3, element.patrimonio, element.codigo);
+
         ++ci;
     });
 
-    var AtivoChart = generateNewChart("AtivoChart", dataChart);
-    var Class01Chart = generateNewChart("Class01Chart",Class01dataChart);
+
+    let AtivoChart = generateNewChart("AtivoChart", dataChart);
+    let Class01Chart = generateNewChart("Class01Chart",Class01dataChart);
+    let Class02Chart = generateNewChart("Class02Chart",Class02dataChart);
+    let Class03Chart = generateNewChart("Class03Chart",Class03dataChart);
 
     // Add event listener for opening and closing details
     $('#ativosList tbody').on('click', 'td.details-control', function() {
@@ -256,8 +241,35 @@ $(document).ready(function() {
 
 });
 
-function generateNewChart(element, data) {
+let colors = ["#FF6666", "#FFB266", "#FFFF66", "#66FF66", "#66FFFF", "#66B2FF", "#6666FF", "#B266FF",
+        "#FF66FF", "#FF66B2", "#C0C0C0"];
 
+let Class01dataChart = {labels: ["Indefinido"], datasets:[{ data: [0], backgroundColor: [0] }]};
+let Class02dataChart = {labels: ["Indefinido"], datasets:[{ data: [0], backgroundColor: [0] }]};
+let Class03dataChart = {labels: ["Indefinido"], datasets:[{ data: [0], backgroundColor: [0] }]};
+
+// Class01dataChart = addItemsToGraph(element,Class01dataChart, element.class.c1, element.patrimonio, element.codigo);
+function addItemsToGraph(DataChart,classif, patrimonio, codigo) {
+    let position;
+    if(classif=="") { //  Se nao tiver categoria
+        //console.log("Indefinido: "+codigo+" Pat: "+Number(patrimonio.toFixed(2)));
+        DataChart.datasets[0].data[0] += Number(patrimonio.toFixed(2));
+        DataChart.datasets[0].backgroundColor[0] = colors[0];
+    } else if(DataChart.labels.includes(classif)) { // se categoria ja tiver sido add
+            //console.log(codigo+": Adicionando Existente")
+            position = DataChart.labels.indexOf(classif);
+            DataChart.datasets[0].data[position] += Number(patrimonio.toFixed(2));
+    } else { // Inseriondo nova categoria ao grafico
+        //console.log(codigo+": Pushing")
+            DataChart.labels.push(classif);
+            DataChart.datasets[0].data.push(Number(patrimonio.toFixed(2)));
+            DataChart.datasets[0].backgroundColor.push(colors[DataChart.datasets[0].backgroundColor.length]);
+    }
+    return DataChart;
+}
+
+
+function generateNewChart(element, data) {
     return new Chart(document.getElementById(element),{
         type:"doughnut",
         data: data,
@@ -266,8 +278,8 @@ function generateNewChart(element, data) {
             legend: {
                 position: 'right',
                 labels: {
-                    fontSize:18,
-                    boxWidth: 80,
+                    fontSize:14,
+                    boxWidth: 50,
                     fontColor:'#ffffff',
                 }
             },

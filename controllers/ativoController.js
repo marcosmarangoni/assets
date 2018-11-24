@@ -106,18 +106,26 @@ async function createAtivo(request, response) {
  * @param {Response} response 
  */
 async function createTrade(request, response) {    
-
-    
-
+    let tipo = request.body.tipo;
+    let valor = Number(request.body.valor);
+    let qtdd = request.body.quantidade;
+    if(tipo=="c") {
+        valor *=  -1;
+    } 
+    if(tipo=="v") {
+        qtdd *= -1;
+    }
     const id = request.body.id;
     const novotrade = {
         trade_id: mongoose.Types.ObjectId(),
         date:request.body.date,
-        tipo:request.body.tipo,
-        value:Number(request.body.valor)
+        tipo: tipo,
+        value: valor
     };
     
-    ativo = await Ativo.findOneAndUpdate({_id: id}, {$push: {trades: novotrade}});
+    ativo = await Ativo.findOneAndUpdate({_id: id}, {
+        $inc: { saldo : qtdd },
+        $push: {trades: novotrade}});
 
     response.redirect('/ativos');
 }
@@ -130,15 +138,18 @@ async function createTrade(request, response) {
 async function editTrade(request, response) {
     const id = request.body.id;
     const tradeid = request.body.tradeid;
+
+    if(request.body.remove) {
+        await Ativo.findOneAndUpdate({_id: id }, {$pull: {trades: {trade_id:mongoose.Types.ObjectId(tradeid) }} });
+    } else {
+        
     const editedtrade = {
-        trade_id: mongoose.Types.ObjectId(),
         date:request.body.date,
         tipo:request.body.tipo,
         value:Number(request.body.valor)
     };
-
     await Ativo.findOneAndUpdate({_id: id, "trades.trade_id": mongoose.Types.ObjectId(tradeid)}, {$set: { "trades.$":editedtrade }});
-    
+    }
     response.redirect('/ativos');
 }
 
@@ -148,8 +159,6 @@ async function editTrade(request, response) {
  * @param {Response} response 
  */
 async function editAtivo(request, response) {
-
-
     ativo = await Ativo.findOneAndUpdate({_id: request.body.id}, { 
         $set: {
             codigo: request.body.ativo,
@@ -157,7 +166,6 @@ async function editAtivo(request, response) {
             unitario: Number(request.body.unitario),
             guess: Number(request.body.guess),
             class: { c1: request.body.class_1 , c2: request.body.class_2, c3: request.body.class_3 },
-
         }
     });
     
