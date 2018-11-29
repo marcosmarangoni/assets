@@ -21,8 +21,10 @@ router.post('/ativos/edit', ativoController.editAtivo);
 router.post('/ativos/edittrade', ativoController.editTrade);
 
 var goalController = require('../controllers/goalController');
-router.get('/goals', goalController.index);
-router.post('/goals', goalController.indexList);
+router.get('/goals/', goalController.index);
+router.post('/goals/create', goalController.create);
+router.get('/goals/:goalID', goalController.ShowGoal);
+router.post('/goals/:goalID', goalController.ShowGoalData);
 module.exports = router;
 
 

@@ -1,6 +1,6 @@
 $(document).ready(function() {
     let goal;
-    $.ajax({url: "/goals", type: "POST", async: false ,  success: function(result){
+    $.ajax({url: "/goals/1", type: "POST", async: false ,  success: function(result){
         goal = result;
     }});
 
@@ -42,5 +42,4 @@ $(document).ready(function() {
         goal.amtStart = goal.amtStart * mgrowth;
     }
     console.log(goal);
-
 });

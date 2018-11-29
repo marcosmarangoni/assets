@@ -16,15 +16,24 @@ async.waterfall([
 
 user = {_id : "5be17559311d5c0fb0f42d1d", stats: {return: 15, assetamt:15000 }};
 
-
 /************************************************************
  * 
  * @param {Request} request 
  * @param {Response} response 
  */
 async function index(request, response) {
-
     response.render('goals/index'); 
+}
+
+
+/************************************************************
+ * 
+ * @param {Request} request 
+ * @param {Response} response 
+ */
+async function ShowGoal(request, response) {
+
+    response.render('goals/show'); 
 }
 
 /************************************************************
@@ -32,7 +41,7 @@ async function index(request, response) {
  * @param {Request} request 
  * @param {Response} response 
  */
-async function indexList(request, response) {
+async function ShowGoalData(request, response) {
 
     let goalConf = {
         movs: [ // 0 is the configuration of the goal
@@ -152,7 +161,8 @@ async function indexList(request, response) {
  * @param {Response} response 
  */
 async function create(request, response) {
-    response.render('goals/create'); 
+    response.send(request.body);
+    //response.render('goals/create'); 
 }
 
 /************************************************************
@@ -182,11 +192,12 @@ module.exports = {
      * Get methods
      */
     index,
-    create,
+    ShowGoal,
+    
     /*
      * Post methods
      */
-    createGoal,
-    indexList,
-    editGoal,
+    create,
+    ShowGoalData,
+    
 }
