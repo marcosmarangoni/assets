@@ -1,6 +1,7 @@
 let mongoose = require('mongoose');
 const async = require('async');
 const User = require('../models/user');
+//const bodyParser = require('body-parser')
 
 // Temporary:
 
@@ -161,6 +162,10 @@ async function ShowGoalData(request, response) {
  * @param {Response} response 
  */
 async function create(request, response) {
+    //bodyParser.urlencoded({ extended: false })
+    
+    //console.log(request.body.datestart[0]);
+    
     response.send(request.body);
     //response.render('goals/create'); 
 }
