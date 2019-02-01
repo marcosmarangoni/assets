@@ -9,14 +9,14 @@ const User = require('../models/user');
 let user;
 async.waterfall([
     function(cb) {
-        //User.findOne({email:"marcosmarangoni2@gmail.com"}).select({"first_name":1, "stats.return":1 }).lean().exec(cb);
+        User.findOne({email:"cesar.reboucas@gmail.com"}).select({"stats.return":1 }).lean().exec(cb);
     }],
     function (err, results) {
         if(err) {console.log(err);}
         user = results;
 });
 
-user = {_id : "5be17559311d5c0fb0f42d1d", stats: {return: 15 }};
+//user = {_id : "5bf25f5e94e80e2d58623e2a", stats: {return: 15 }};
 
 
 /************************************************************
@@ -143,12 +143,13 @@ async function editTrade(request, response) {
         await Ativo.findOneAndUpdate({_id: id }, {$pull: {trades: {trade_id:mongoose.Types.ObjectId(tradeid) }} });
     } else {
         
-    const editedtrade = {
-        date:request.body.date,
-        tipo:request.body.tipo,
-        value:Number(request.body.valor)
-    };
-    await Ativo.findOneAndUpdate({_id: id, "trades.trade_id": mongoose.Types.ObjectId(tradeid)}, {$set: { "trades.$":editedtrade }});
+        const editedtrade = {
+            date:request.body.date,
+            tipo:request.body.tipo,
+            value:Number(request.body.valor)
+        };
+
+        await Ativo.findOneAndUpdate({_id: id, "trades.trade_id": mongoose.Types.ObjectId(tradeid)}, {$set: { "trades.$":editedtrade }});
     }
     response.redirect('/ativos');
 }

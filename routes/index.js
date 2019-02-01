@@ -10,10 +10,10 @@ router.get('/form', function (req, res) {
 });
 
 var ativoController = require('../controllers/ativoController');
-router.get('/ativos', ativoController.index);
+router.get( '/ativos', ativoController.index);
 router.post('/ativos', ativoController.indexList);
 
-router.get('/ativos/create', ativoController.create);
+router.get( '/ativos/create', ativoController.create);
 router.post('/ativos/create', ativoController.createAtivo);
 
 router.post('/ativos/newtrade', ativoController.createTrade);
@@ -21,9 +21,10 @@ router.post('/ativos/edit', ativoController.editAtivo);
 router.post('/ativos/edittrade', ativoController.editTrade);
 
 var goalController = require('../controllers/goalController');
-router.get('/goals/', goalController.index);
-router.post('/goals/create', goalController.create);
-router.get('/goals/:goalID', goalController.ShowGoal);
+router.get( '/goals/', goalController.index);
+router.post('/goals/', goalController.indexList);
+router.post('/goals/create', goalController.createGoal);
+router.get( '/goals/:goalID', goalController.ShowGoal);
 router.post('/goals/:goalID', goalController.ShowGoalData);
 module.exports = router;
 

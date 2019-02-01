@@ -22,7 +22,7 @@ function formatTable ( d ) {
                 tipo = "Dividendo"
                 break;
         }
-        console.log(element.date);
+        console.log(element);
         let tempdata = element.date.split('T');
         let dateArray = tempdata[0].split('-');
         let date = new Date(dateArray[0],(dateArray[1]-1),dateArray[2],0,0,0,0);
@@ -41,7 +41,6 @@ function formatTable ( d ) {
 // Edit Trade
 function fillEditTradeModal(objid, tradeid, date, value, tipo) {
     $('#f3txtid').val(objid);
-    $('#f3txttradeid').val(tradeid);
     $('#f3txttradeid').val(tradeid);
     $('#f3txtdate').val(date);
     $('#f3txtvalor').val(value);

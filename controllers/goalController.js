@@ -1,6 +1,7 @@
-let mongoose = require('mongoose');
+//let mongoose = require('mongoose');
 const async = require('async');
 const User = require('../models/user');
+const Goal = require('../models/goal');
 //const bodyParser = require('body-parser')
 
 // Temporary:
@@ -8,14 +9,14 @@ const User = require('../models/user');
 let user;
 async.waterfall([
     function(cb) {
-        //User.findOne({email:"marcosmarangoni2@gmail.com"}).select({"first_name":1, "stats.assetamt":1, "stats.return":1 }).lean().exec(cb);        
+        User.findOne({email:"cesar.reboucas@gmail.com"}).lean().exec(cb);
     }],
     function (err, results) {
         if(err) {console.log(err);}
         user = results;
 });
 
-user = {_id : "5be17559311d5c0fb0f42d1d", stats: {return: 15, assetamt:15000 }};
+//user = {_id : "5bf25f5e94e80e2d58623e2a", stats: {return: 15 }};
 
 /************************************************************
  * 
@@ -24,6 +25,15 @@ user = {_id : "5be17559311d5c0fb0f42d1d", stats: {return: 15, assetamt:15000 }};
  */
 async function index(request, response) {
     response.render('goals/index'); 
+}
+
+/************************************************************
+ * 
+ * @param {Request} request 
+ * @param {Response} response 
+ */
+async function indexList(request, response) {
+    response.send('Lista dos Goals'); 
 }
 
 
@@ -161,25 +171,44 @@ async function ShowGoalData(request, response) {
  * @param {Request} request 
  * @param {Response} response 
  */
-async function create(request, response) {
-    //bodyParser.urlencoded({ extended: false })
+async function createGoal(request, response) {
+    ///
+    /// TROCAR PARA OS METODOS CERTOS,
+    /// PUXAR PARA EXIBICAO
+    ///
+
     
     //console.log(request.body.datestart[0]);
-    
-    response.send(request.body);
-    //response.render('goals/create'); 
+    goals = new Array();
+    let e;
+    for(var key in request.body) {
+          e = key.split('_');
+          console.log("Agora: " + e);
+          if(goals[e[1]]) {
+            //console.log("passou");
+            goals[e[1]][e[0]] = request.body[key];
+            //console.log("travou?");
+          } else {
+            goals[e[1]] = { [e[0]] : request.body[key] };
+          }
+          
+          //console.log(e);
+        
+      }
+      GoalParams = {
+        user_id: user._id,
+        fluxos: goals,
+      }
+      const goal = new Goal(GoalParams);
+      try {
+        await goal.save();
+        response.redirect('/goals');
+    } catch (error) {
+        response.send({ error: true, errors: error.errors })
+    }
 }
 
-/************************************************************
- * 
- * @param {Request} request 
- * @param {Response} response 
- */
-async function createGoal(request, response) {
-    
-        response.redirect('/goals');
-    
-}
+
 
 /************************************************************
  * 
@@ -193,16 +222,11 @@ async function editGoal(request, response) {
 
 
 module.exports = {
-    /*
-     * Get methods
-     */
-    index,
-    ShowGoal,
     
-    /*
-     * Post methods
-     */
-    create,
+    index, // Get
+    indexList, // Post
+    ShowGoal, // Get
+    createGoal,
     ShowGoalData,
     
 }
