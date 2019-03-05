@@ -32,7 +32,7 @@ function formatTable ( d ) {
                     <td class="text-center"><button '+disabled+' onClick="fillEditTradeModal(\''+
                         (d._id)+'\',\''+element.trade_id+'\',\''+
                         dateArray[0]+'-'+dateArray[1]+'-'+dateArray[2]+'\',\''+element.value+'\',\''+element.tipo+'\')" \
-                    class="btn btn-sm">Edit Trade</button></td></tr>';
+                    class="btn btn-sm btn-light">Edit Trade</button></td></tr>';
     });
     t += '</table>';
     return t;
@@ -121,7 +121,10 @@ $(document).ready(function() {
                 render: $.fn.dataTable.render.number( '.', ',', 2, 'R$ ' ),
             },
             {
-                data: 'retorno',
+                
+                data: function ( data, type, row, meta ) {
+                    return data.guess * 100;
+                  },
                 className: "text-right",
                 render: $.fn.dataTable.render.number( '.', ',', 2,'','%'),
             },
@@ -130,9 +133,9 @@ $(document).ready(function() {
                 width: "5px", 
                 className: "text-center text-nowrap",
                 data: null,
-                defaultContent: '<button id="btnopcoes" class="btn btn-sm">\
+                defaultContent: '<button id="btnopcoes" class="btn btn-sm btn-light">\
                         Op&ccedil;&otilde;es</button> \
-                        <button id="btnaddtrade" class="btn btn-sm">Add Trade</button>',
+                        <button id="btnaddtrade" class="btn btn-sm btn-light">Add Trade</button>',
             }
         ],
         "footerCallback": function (tfoot, data, start, end, display) {
@@ -160,11 +163,16 @@ $(document).ready(function() {
         dataChart.datasets[0].data.push(Number(element.patrimonio.toFixed(2)));
         dataChart.datasets[0].backgroundColor.push(colors[ci%10]);
     
-        console.log(element.codigo+" - "+element.class.c1+" - "+Number(element.patrimonio.toFixed(2)));
-
-        Class01dataChart = addItemsToGraph(Class01dataChart, element.class.c1, element.patrimonio, element.codigo);
-        Class02dataChart = addItemsToGraph(Class02dataChart, element.class.c2, element.patrimonio, element.codigo);
-        Class03dataChart = addItemsToGraph(Class03dataChart, element.class.c3, element.patrimonio, element.codigo);
+        //console.log(element.codigo+" - "+element.class.c1+" - "+Number(element.patrimonio.toFixed(2)));
+        if(element.class) {
+            Class01dataChart = addItemsToGraph(Class01dataChart, element.class.c1, element.patrimonio, element.codigo);
+            Class02dataChart = addItemsToGraph(Class02dataChart, element.class.c2, element.patrimonio, element.codigo);
+            Class03dataChart = addItemsToGraph(Class03dataChart, element.class.c3, element.patrimonio, element.codigo);
+        } else {
+            Class01dataChart = addItemsToGraph(Class01dataChart, "", element.patrimonio, element.codigo);
+            Class02dataChart = addItemsToGraph(Class02dataChart, "", element.patrimonio, element.codigo);
+            Class03dataChart = addItemsToGraph(Class03dataChart, "", element.patrimonio, element.codigo);
+        }
 
         ++ci;
     });

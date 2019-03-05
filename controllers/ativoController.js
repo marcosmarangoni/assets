@@ -1,4 +1,4 @@
-let YReturn = require('../services/yreturn');
+let Return = require('../services/yreturn');
 const Ativo = require('../models/ativo');
 let mongoose = require('mongoose');
 const async = require('async');
@@ -39,18 +39,26 @@ async function indexList(request, response) {
     let Ativos = await Ativo.find({user_id: user._id}).sort('codigo').collation({locale: "en", strength: 1});
     let patrimonio, patriminioTotal=0;
     for(let x = 0; x < Ativos.length ; ++x) {
-        patrimonio = Number(Ativos[x].unitario * Ativos[x].saldo)
-        Ativos[x].set('retorno', YReturn.calc(Ativos[x].trades, patrimonio, Ativos[x].guess), { strict: false });
-        Ativos[x].set('patrimonio', patrimonio, { strict: false });
-        Array.prototype.push.apply(TotalAtivos.trades,Ativos[x].trades); 
-        patriminioTotal += patrimonio;
+        Ativos[x].setInterval();
+        Ativos[x].sortTrades();
+        Ativos[x].setGuess();
+        
+        //patrimonio = Number(Ativos[x].unitario * Ativos[x].saldo);
+        //let ret = new Return(Ativos[x].trades, patrimonio, Ativos[x].guess);
+        //Ativos[x].set('retorno', ret.retorno , { strict: false });
+        //Ativos[x].set('patrimonio', patrimonio, { strict: false });
+        //console.log(Ativos[x].test());
+        //Array.prototype.push.apply(TotalAtivos.trades,Ativos[x].trades); 
+        //patriminioTotal += patrimonio;
     }
-    TotalAtivos.retorno = YReturn.calc(TotalAtivos.trades, 0, user.stats.return);
+    /*
+    let retTotal = new Return(TotalAtivos.trades, 0, user.stats.return);
+    TotalAtivos.retorno = retTotal.retorno;
     TotalAtivos.patrimonio = patriminioTotal;
     delete TotalAtivos.trades;
-
-    await User.findOneAndUpdate({_id: user._id}, 
-        {"stats.assetamt": TotalAtivos.patrimonio, "stats.return": TotalAtivos.retorno}); 
+    */
+    /*await User.findOneAndUpdate({_id: user._id}, 
+        {"stats.assetamt": TotalAtivos.patrimonio, "stats.return": TotalAtivos.retorno}); */
     //console.log(user);
     response.send({AtivosTable : Ativos, TotalAtivos: TotalAtivos});
     
@@ -82,13 +90,12 @@ async function createAtivo(request, response) {
         codigo: request.body.codigo,
         saldo: request.body.quantidade,
         unitario: unit,
-        div_projection: {timesperyear:0, value:0, datestart:null, dateend: null},
+        guess: 0,
         trades: {
             trade_id: mongoose.Types.ObjectId(),
             date: request.body.date,
             tipo: request.body.tipo,
             value: Number(request.body.valor),
-            comment: "Inicial",
         },
     }
     const ativo = new Ativo(ativoParams);
@@ -108,7 +115,12 @@ async function createAtivo(request, response) {
 async function createTrade(request, response) {    
     let tipo = request.body.tipo;
     let valor = Number(request.body.valor);
-    let qtdd = request.body.quantidade;
+    let qtdd;
+    if(isNaN(request.body.quantidade)) {
+        qtdd = 0;
+    } else {
+        qtdd = Number(request.body.quantidade);
+    }
     if(tipo=="c") {
         valor *=  -1;
     } 
@@ -122,11 +134,12 @@ async function createTrade(request, response) {
         tipo: tipo,
         value: valor
     };
-    
+    //let ativo = await Ativo.findOne({_id: id});
+    //console.log(ativo.saldo);
     ativo = await Ativo.findOneAndUpdate({_id: id}, {
         $inc: { saldo : qtdd },
         $push: {trades: novotrade}});
-
+    //console.log(ativo);
     response.redirect('/ativos');
 }
 
