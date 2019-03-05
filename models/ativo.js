@@ -51,16 +51,16 @@ AtivoSchema.methods.setInterval = function() {
     if(this.trades[x].value > 0) {this.sum_in += this.trades[x].value;} else {this.sum_out += this.trades[x].value;}
   }
   
-  this.set('patrimonio', Number(this.saldo * this.unitario), { strict: false });
-  this.patrimonio = Number(this.saldo * this.unitario); // Twice?
-
+  
+  //this.set('patrimonio', Number(this.unitario * this.saldo), { strict: false });
+  
   this.trades.push(
     {date: now,
     tipo: "p" , 
     value: this.patrimonio,
     interval: 0}
   );
-  console.log("pat:" + this.patrimonio);
+  //console.log("This: "+this);
   this.sum_in += this.patrimonio;
 };
 
@@ -100,40 +100,49 @@ AtivoSchema.methods.irr = function() {
 
   do {
     // Seguranca do Guess
-    if(this.guess > 2 || this.guess < -0.5 || isNaN(this.guess)) { // Maior que 200% ou menor que -50%
+    if((this.guess > 2 && i==0) || (this.guess < -0.5 && i==0) || isNaN(this.guess)) { // Maior que 200% ou menor que -50%
       this.guess = 0.1 * i;
-    }
+    } 
     ++i;
     vp_all = this.checkVP();
+    
+    if(isNaN(vp_all)) {
+      this.guess = 0;
+      vp_all = this.checkVP();
+      if(isNaN(vp_all)) {
+        i = 500;
+        this.guess = 0;
+        break;
+      }
+    }
 
     vp_third = vp_second;
     guess_third = guess_second;
     vp_second = vp_all;
     guess_second = this.guess;
     
-    console.log('Try: '+i+' VP: '+vp_all.toFixed(4) + ' Guess: '+this.guess.toFixed(8)+' IN:'+this.sum_in);
+    console.log('Try: '+i+' VP: '+vp_all.toFixed(4) + ' Guess: '+this.guess.toFixed(8)+' IN:'+this.sum_in+' COD: '+this.codigo);
     
     if(vp_third!=0) {
         //guess = (((-vp_second*guess_third)+(vp_second*guess_second))/( vp_third - vp_second )) + guess_second;
         //guess = ((guess_third * vp_second) - (guess_second * vp_third)) / (vp_second - vp_third);
         this.guess = guess_second - (((guess_third - guess_second) * vp_second) / (vp_third - vp_second));
 
-        console.log('Gues by Interpolation');
-        console.log('Gues_Sec: '+guess_second+' Guess_Third: '+guess_third);
-        console.log('Vp_Sec: '+vp_second+' VP_Third: '+vp_third);
+        console.log('New Gues by Interpolation: '+this.guess);
+        console.log('Used -> Gues_Sec: '+guess_second+' Guess_Third: '+guess_third);
+        console.log('Used -> Vp_Sec: '+vp_second+' VP_Third: '+vp_third);
 
     } else {
             this.guess += (vp_all/this.sum_in);
-            console.log('Gues by else');
+            console.log('New Gues by else '+this.guess);
     } 
     
 
     //console.log("VPS: "+vp_all+" "+vp_second+" "+vp_third);
     console.log('\n');
   
-  } while (Math.abs(vp_all) > 0.01 && this.guess<=100 && i <= 500);
-  console.log('IRR: '+Number((this.guess-1)*100).toFixed(2)+' Try:'+i );
-  return Number(((this.guess)*100).toFixed(2));
+  } while (Math.abs(vp_all) > 0.01 &&  i < 500);
+  console.log('IRR: '+Number(this.guess*100).toFixed(2)+'% Try:'+i );
 }
 
 AtivoSchema.methods.checkVP = function() {
@@ -144,6 +153,16 @@ AtivoSchema.methods.checkVP = function() {
   });
   return sum;
 }
+
+AtivoSchema.virtual('patrimonio').get(function() {
+  return Number(this.saldo * this.unitario);
+}).
+set(function(v) {
+  this.saldo = 1;
+  this.unitario = v;
+});
+
+AtivoSchema.set('toJSON', { getters: true, virtuals: true });
 
 
 module.exports = mongoose.model('ativo', AtivoSchema);

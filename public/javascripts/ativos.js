@@ -140,7 +140,7 @@ $(document).ready(function() {
         ],
         "footerCallback": function (tfoot, data, start, end, display) {
             $(tfoot).find('th').eq(0).html( $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display(results.TotalAtivos.patrimonio) );
-            $(tfoot).find('th').eq(1).html( $.fn.dataTable.render.number('.', ',', 2, '% ').display(results.TotalAtivos.retorno) );
+            $(tfoot).find('th').eq(1).html( $.fn.dataTable.render.number('.', ',', 2, '').display(results.TotalAtivos.guess * 100) +'%' );
 
         }
     });

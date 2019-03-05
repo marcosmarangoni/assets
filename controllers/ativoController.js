@@ -38,29 +38,30 @@ async function indexList(request, response) {
     let TotalAtivos = { trades:new Array() };
     let Ativos = await Ativo.find({user_id: user._id}).sort('codigo').collation({locale: "en", strength: 1});
     let patrimonio, patriminioTotal=0;
+    AtivoTotal = new Ativo();
+    AtivoTotal.patrimonio = 0;
     for(let x = 0; x < Ativos.length ; ++x) {
         Ativos[x].setInterval();
         Ativos[x].sortTrades();
         Ativos[x].setGuess();
         
-        //patrimonio = Number(Ativos[x].unitario * Ativos[x].saldo);
-        //let ret = new Return(Ativos[x].trades, patrimonio, Ativos[x].guess);
-        //Ativos[x].set('retorno', ret.retorno , { strict: false });
-        //Ativos[x].set('patrimonio', patrimonio, { strict: false });
-        //console.log(Ativos[x].test());
-        //Array.prototype.push.apply(TotalAtivos.trades,Ativos[x].trades); 
-        //patriminioTotal += patrimonio;
+        AtivoTotal.trades = AtivoTotal.trades.concat(Ativos[x].trades);
+        
+        AtivoTotal.patrimonio += Ativos[x].patrimonio;
     }
-    /*
-    let retTotal = new Return(TotalAtivos.trades, 0, user.stats.return);
-    TotalAtivos.retorno = retTotal.retorno;
-    TotalAtivos.patrimonio = patriminioTotal;
-    delete TotalAtivos.trades;
-    */
-    /*await User.findOneAndUpdate({_id: user._id}, 
-        {"stats.assetamt": TotalAtivos.patrimonio, "stats.return": TotalAtivos.retorno}); */
-    //console.log(user);
-    response.send({AtivosTable : Ativos, TotalAtivos: TotalAtivos});
+    AtivoTotal.sum_in = 0;
+    AtivoTotal.sum_out = 0;
+    AtivoTotal.trades.forEach(td => {
+        if(td.value > 0) {AtivoTotal.sum_in += td.value;} else {AtivoTotal.sum_out += td.value;}    
+    });
+    
+    AtivoTotal.guess = user.stats.return;
+    AtivoTotal.setGuess();
+
+    await User.findOneAndUpdate({_id: user._id}, 
+        {"stats.assetamt": AtivoTotal.patrimonio, "stats.return": AtivoTotal.guess}); 
+    
+    response.send({AtivosTable : Ativos , TotalAtivos: AtivoTotal});
     
 }
 
@@ -157,6 +158,7 @@ async function editTrade(request, response) {
     } else {
         
         const editedtrade = {
+            trade_id: mongoose.Types.ObjectId(),
             date:request.body.date,
             tipo:request.body.tipo,
             value:Number(request.body.valor)
