@@ -53,46 +53,107 @@ async function ShowGoal(request, response) {
  * @param {Response} response 
  */
 async function ShowGoalData(request, response) {
-
+    // Objeto Original
     let goalConf = {
-        movs: [ // 0 is the configuration of the goal
+        movs: [ 
             {
-            name: "",
-            startMonth: "current", // Can be current or MM
-            startYear: "current", // Can be current or YYYY
-            endMonth: "12", // Can be current or MM
-            endYear: "2025", // Can be current or YYYY
-            amtStart: "assetamt", // Can be "assetamt" or any valid value
-            growth: "return" }, //Can be return or any value 
+                name: "Patrimonio",
+                type: "P" //P -> Patrimonio || O-> Once || M -> Montly || S -> Saldo
+            }, //Can be return or any value 
             {
-            name: "Savins",
-            startMonth: "05",
-            startYear: "2019", 
-            endMonth: "10", 
-            endYear: "2025", 
-            amtStart: 1500,
-            growth: 5 }, 
+                name: "Total",
+                growth: 0.07, // Or P, to follow the patrimonio
+                type:"S"
+            },
             {
-            name: "Retire",
-            startMonth: "05",
-            startYear: "2020", 
-            endMonth: "12", 
-            endYear: "2025", 
-            amtStart: -1000,
-            growth: 3 }, 
+                name: "Divida",
+                startMonth: "01",
+                startYear: "2018", 
+                endMonth: "10", 
+                endYear: "2025", 
+                amtStart: -15000,
+                growth: 0.07,
+                type: "O"
+            },
             {
-            name: "Mortage",
-            startMonth: "04",
-            startYear: "2020", 
-            endMonth: "03", 
-            endYear: "2025", 
-            amtStart: -1200,
-            growth: 1.5 }, 
-
+                name: "Savins",
+                startMonth: "05",
+                startYear: "2019", 
+                endMonth: "10", 
+                endYear: "2025", 
+                amtStart: 1500,
+                growth: 0.05,
+                type: "M"
+            }, 
+            {
+                name: "Retire",
+                startMonth: "05",
+                startYear: "2020", 
+                endMonth: "12", 
+                endYear: "2025", 
+                amtStart: -1000,
+                growth: 0.03,
+                type: "M"
+            }, 
+            {
+                name: "Mortage",
+                startMonth: "04",
+                startYear: "2020", 
+                endMonth: "03", 
+                endYear: "2025", 
+                amtStart: -1200,
+                growth: 0,
+                type:"M"
+            }
         ]
     };
 
+    // M First, O Onces and then Patrimonio
+    // Mover para dentro do model
+    goalConf.movs.sort(function (a, b) {
+        if (a.type < b.type) {
+            return -1;
+        } else if (a.type > b.type) {
+            return 1;
+        }
+    });
+
     let today = new Date();
+    let table = { r: [] };
+    let y = today.getFullYear();
+    let m = (today.getMonth()+1);
+    keep = true;
+    let lineM;
+    while(keep) {
+        lineM = new Array(m+'-'+y);
+        goalConf.movs.forEach(goal => {
+            switch(goal.type) {
+                case "M":
+                    lineM.push(goal.amtStart);        
+                    break;
+                case "O":
+                    lineM.push(goal.amtStart);        
+                    break;
+                case "P":
+                    lineM.push(0);        
+                    break;
+                case "S":
+                    lineM.push("sss");        
+                    break;
+            }
+        });
+        table.r.push( lineM );
+        ++m;
+        if(m==13) {
+            m=1;
+            ++y;
+        }
+        if(y == 2030) { keep=false; }
+    }
+    
+
+    response.send(table);
+    /*let today = new Date();
     let labels = new Array();
     for(x=0 ;  x < goalConf.movs.length; ++x ) {
         labels.push(goalConf.movs[x].name);
@@ -119,9 +180,9 @@ async function ShowGoalData(request, response) {
 
         // Set Interest Rate
         if(goalConf.movs[x].growth=="return") {
-            goalConf.movs[x].growth = (user.stats.return / 100) + 1;
+            goalConf.movs[x].growth = user.stats.return + 1;
         } else {
-            goalConf.movs[x].growth = (goalConf.movs[x].growth / 100) + 1;
+            goalConf.movs[x].growth = goalConf.movs[x].growth + 1;
         }
         //console.log(goalConf.movs[x]);
     }
@@ -160,9 +221,9 @@ async function ShowGoalData(request, response) {
         goal.rows.push(obj)
         //console.log(goal.row);    
     }
-    
+    */   
 
-    response.send(goal);
+    //response.send(goal);
     
 }
 

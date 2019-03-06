@@ -67,7 +67,7 @@ AtivoSchema.methods.setInterval = function() {
 AtivoSchema.methods.sortTrades = function() {
   this.trades.sort(function (tA, tB) {
     return (tA.date - tB.date);
-  })
+  });
 };
 
 AtivoSchema.methods.setGuess = function () {
@@ -78,11 +78,11 @@ AtivoSchema.methods.setGuess = function () {
 
   if( this.trades[0].interval < min_interval || this.trades.length == 2 ) { // Intervalo pequeno ou apenas 2 movimentos
     if( isNaN(retorno) || retorno<=0.01 ) { // sem saida ou sem entrada / prejuizo muito grande.
-        console.log("Retorno da Merda - "+this.codigo);
-        this.guess = -0.99; 
+      console.log("Retorno da Merda - "+this.codigo);
+      this.guess = -0.99; 
     } else { // Calculo Simples
-        console.log("Ret Simples Oper: "+this.trades.length+" Taxa:"+(Math.pow(retorno,(1/Math.max(min_interval,this.trades[0].interval)))-1)+" "+this.codigo);
-        this.guess =(Math.pow(retorno,(1/Math.max(min_interval,this.trades[0].interval)))-1);
+      console.log("Ret Simples Oper: "+this.trades.length+" Taxa:"+(Math.pow(retorno,(1/Math.max(min_interval,this.trades[0].interval)))-1)+" "+this.codigo);
+      this.guess =(Math.pow(retorno,(1/Math.max(min_interval,this.trades[0].interval)))-1);
     } 
   } else { 
     if( isNaN(this.guess) ) { this.guess = retorno; }
@@ -110,7 +110,7 @@ AtivoSchema.methods.irr = function() {
       this.guess = 0;
       vp_all = this.checkVP();
       if(isNaN(vp_all)) {
-        i = 500;
+        i = 100;
         this.guess = 0;
         break;
       }
@@ -121,27 +121,34 @@ AtivoSchema.methods.irr = function() {
     vp_second = vp_all;
     guess_second = this.guess;
     
+    if(i>=6) {
+      if(Math.abs(vp_all) > Math.abs(vp_second) || Math.abs(vp_second) > Math.abs(vp_third)) {
+        // Nao estou aproximando do Zero, provavelmente o IRR e impossivel
+        i = 100;
+        this.guess = 0;
+        break;
+      }
+    }
+
     console.log('Try: '+i+' VP: '+vp_all.toFixed(4) + ' Guess: '+this.guess.toFixed(8)+' IN:'+this.sum_in+' COD: '+this.codigo);
     
     if(vp_third!=0) {
-        //guess = (((-vp_second*guess_third)+(vp_second*guess_second))/( vp_third - vp_second )) + guess_second;
-        //guess = ((guess_third * vp_second) - (guess_second * vp_third)) / (vp_second - vp_third);
-        this.guess = guess_second - (((guess_third - guess_second) * vp_second) / (vp_third - vp_second));
+      this.guess = guess_second - (((guess_third - guess_second) * vp_second) / (vp_third - vp_second));
 
-        console.log('New Gues by Interpolation: '+this.guess);
-        console.log('Used -> Gues_Sec: '+guess_second+' Guess_Third: '+guess_third);
-        console.log('Used -> Vp_Sec: '+vp_second+' VP_Third: '+vp_third);
+      console.log('New Gues by Interpolation: '+this.guess);
+      console.log('Used -> Gues_Sec: '+guess_second+' Guess_Third: '+guess_third);
+      console.log('Used -> Vp_Sec: '+vp_second+' VP_Third: '+vp_third);
 
     } else {
-            this.guess += (vp_all/this.sum_in);
-            console.log('New Gues by else '+this.guess);
+      this.guess += (vp_all/this.sum_in);
+      console.log('New Gues by else '+this.guess);
     } 
     
 
     //console.log("VPS: "+vp_all+" "+vp_second+" "+vp_third);
     console.log('\n');
   
-  } while (Math.abs(vp_all) > 0.01 &&  i < 500);
+  } while (Math.abs(vp_all) > 0.01 &&  i < 100);
   console.log('IRR: '+Number(this.guess*100).toFixed(2)+'% Try:'+i );
 }
 
