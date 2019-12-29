@@ -3,6 +3,7 @@ $(document).ready(function() {
     $.ajax({url: "/goals/1", type: "POST", async: false ,  success: function(result){
         goal = result;
     }});
+    console.log(goal);
 
     const MonthNames = ["", "Jan", "Fev", "Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
     let table = document.getElementById("goalsList");
