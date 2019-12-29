@@ -1,0 +1,31 @@
+<div class="container-flex user-form-container w-50">
+    <h1 class="offset-4">SIGN UP</h1>
+    <form class="user-form" action="/users/create_user" method="POST" id="createUserForm">
+        <div class="alert alert-danger" role="alert" id="error" style="display: none"></div>
+        <div class="form-group">
+            <label for="email">Email address</label>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <i class="fas fa-1x fa-at"></i>
+                    </span>
+                </div>
+                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp"
+                    placeholder="Enter email">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <i class="fas fa-1x fa-lock"></i>
+                    </span>
+                </div>
+                <input type="password" class="form-control" id="password" name="password" aria-describedby="passwordHelp"
+                    placeholder="Enter password">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>

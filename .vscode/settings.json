@@ -9,5 +9,5 @@
     "git.ignoreLimitWarning": true,
     "editor.insertSpaces": true,
     "editor.acceptSuggestionOnCommitCharacter": true,
-    "files.eol": "\n",
+    "files.eol": "\n"
 }
