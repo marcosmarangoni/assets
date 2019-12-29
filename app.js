@@ -13,12 +13,16 @@ const hbs = require('express-handlebars');
 // CSS compiler
 const sassMiddleware = require('node-sass-middleware');
 
+//CORS
+const cors = require('cors');
+
 // Create the index routes
 const indexRouter = require('./routes/index');
 // Users routes
 const usersRouter = require('./routes/users');
 
 const app = express();
+app.use(cors());
 
 // Set up mongoose connection
 const mongoose = require('mongoose');
