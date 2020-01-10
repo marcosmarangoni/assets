@@ -35,20 +35,23 @@ async function index(request, response) {
  * @param {Response} response 
  */
 async function indexList(request, response) {
-    let TotalAtivos = { trades:new Array() };
+    //Total Ativos not used anymore
     let Ativos = await Ativo.find({user_id: user._id}).sort('codigo').collation({locale: "en", strength: 1});
-    let patrimonio, patriminioTotal=0;
-    AtivoTotal = new Ativo();
-    AtivoTotal.patrimonio = 0;
     for(let x = 0; x < Ativos.length ; ++x) {
         Ativos[x].setInterval();
         Ativos[x].sortTrades();
         Ativos[x].setGuess();
         
-        AtivoTotal.trades = AtivoTotal.trades.concat(Ativos[x].trades);
-        
-        AtivoTotal.patrimonio += Ativos[x].patrimonio;
+        //AtivoTotal.trades = AtivoTotal.trades.concat(Ativos[x].trades);
+        //AtivoTotal.patrimonio += Ativos[x].patrimonio;
     }
+    
+    /*let TotalAtivos = { trades:new Array() };
+    
+    let patrimonio, patriminioTotal=0;
+    AtivoTotal = new Ativo();
+    AtivoTotal.patrimonio = 0;
+    
     AtivoTotal.sum_in = 0;
     AtivoTotal.sum_out = 0;
     AtivoTotal.trades.forEach(td => {
@@ -60,8 +63,8 @@ async function indexList(request, response) {
 
     await User.findOneAndUpdate({_id: user._id}, 
         {"stats.assetamt": AtivoTotal.patrimonio, "stats.return": AtivoTotal.guess}); 
-    
-    response.send({AtivosTable : Ativos , TotalAtivos: AtivoTotal});
+    */
+    response.json(Ativos);
     
 }
 
