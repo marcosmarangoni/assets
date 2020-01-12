@@ -10,10 +10,10 @@ router.get('/form', function (req, res) {
 });
 
 var ativoController = require('../controllers/ativoController');
-router.get( '/ativos', ativoController.index);
-router.get('/api/ativos', ativoController.indexList);
 
-router.get( '/ativos/create', ativoController.create);
+router.get('/api/ativos', ativoController.indexList);
+router.get('/api/ativos/:ativoId', ativoController.listAtivo);
+
 router.post('/ativos/create', ativoController.createAtivo);
 
 router.post('/ativos/newtrade', ativoController.createTrade);

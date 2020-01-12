@@ -15,19 +15,7 @@ async.waterfall([
         if(err) {console.log(err);}
         user = results;
 });
-
 //user = {_id : "5bf25f5e94e80e2d58623e2a", stats: {return: 15 }};
-
-
-/************************************************************
- * 
- * @param {Request} request 
- * @param {Response} response 
- */
-async function index(request, response) {
-
-    response.render('ativos/index'); 
-}
 
 /************************************************************
  * 
@@ -65,16 +53,11 @@ async function indexList(request, response) {
         {"stats.assetamt": AtivoTotal.patrimonio, "stats.return": AtivoTotal.guess}); 
     */
     response.json(Ativos);
-    
 }
 
-/************************************************************
- * 
- * @param {Request} request 
- * @param {Response} response 
- */
-async function create(request, response) {
-    response.render('ativos/create'); 
+async function listAtivo(request,response) {
+    let ativo = await Ativo.find({user_id: user._id, _id:request.params.ativoId});
+    response.json(ativo[0]);
 }
 
 /************************************************************
@@ -193,16 +176,11 @@ async function editAtivo(request, response) {
 
 
 module.exports = {
-    /*
-     * Get methods
-     */
-    index,
-    create,
-    /*
-     * Post methods
-     */
-    createAtivo,
+    /*Revised*/
     indexList,
+    listAtivo,
+
+    createAtivo,
     createTrade,
     editAtivo,
     editTrade,
