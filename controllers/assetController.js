@@ -1,5 +1,5 @@
 //let Return = require('../services/yreturn');
-const Ativo = require('../models/ativo');
+const Asset = require('../models/asset.js');
 let mongoose = require('mongoose');
 const async = require('async');
 const User = require('../models/user');
@@ -17,47 +17,21 @@ let user;
 });*/
 user = {_id : "5bf25f5e94e80e2d58623e2a", stats: {return: 15 }};
 
-/************************************************************
- * 
- * @param {Request} request 
- * @param {Response} response 
- */
-async function indexList(request, response) {
+async function getAllWithIRR(request, response) {
     //Total Ativos not used anymore
-    let Ativos = await Ativo.find({user_id: user._id}).sort('codigo').collation({locale: "en", strength: 1});
-    for(let x = 0; x < Ativos.length ; ++x) {
-        Ativos[x].setInterval();
-        Ativos[x].sortMovements();
-        Ativos[x].setGuess();
-        
-        //AtivoTotal.trades = AtivoTotal.trades.concat(Ativos[x].trades);
-        //AtivoTotal.patrimonio += Ativos[x].patrimonio;
+    let Assets = await Asset.find({user_id: user._id}).sort('code').collation({locale: "en", strength: 1});    
+    for(let x = 0; x < Assets.length ; ++x) {
+        Assets[x].setInterval();
+        Assets[x].sortMovements();
+        Assets[x].setGuess();
     }
-    
-    /*let TotalAtivos = { trades:new Array() };
-    
-    let patrimonio, patriminioTotal=0;
-    AtivoTotal = new Ativo();
-    AtivoTotal.patrimonio = 0;
-    
-    AtivoTotal.sum_in = 0;
-    AtivoTotal.sum_out = 0;
-    AtivoTotal.trades.forEach(td => {
-        if(td.value > 0) {AtivoTotal.sum_in += td.value;} else {AtivoTotal.sum_out += td.value;}    
-    });
-    
-    AtivoTotal.guess = user.stats.return;
-    AtivoTotal.setGuess();
-
-    await User.findOneAndUpdate({_id: user._id}, 
-        {"stats.assetamt": AtivoTotal.patrimonio, "stats.return": AtivoTotal.guess}); 
-    */
-    response.json(Ativos);
+    response.json(Assets);
 }
 
-async function listAtivo(request,response) {
-    let ativo = await Ativo.find({user_id: user._id, _id:request.params.ativoId});
-    response.json(ativo[0]);
+
+async function getAssetById(request,response) {
+    let asset = await Asset.find({user_id: user._id, _id:request.params.assetId});
+    response.json(asset[0]);
 }
 
 /************************************************************
@@ -177,8 +151,8 @@ async function editAtivo(request, response) {
 
 module.exports = {
     /*Revised*/
-    indexList,
-    listAtivo,
+    getAllWithIRR,
+    getAssetById,
 
     createAtivo,
     createTrade,

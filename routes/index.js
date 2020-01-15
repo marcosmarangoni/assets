@@ -9,16 +9,17 @@ router.get('/form', function (req, res) {
     res.render('home/form');
 });
 
-var ativoController = require('../controllers/ativoController');
+var assetController = require('../controllers/assetController');
 
-router.get('/api/ativos', ativoController.indexList);
-router.get('/api/ativos/:ativoId', ativoController.listAtivo);
+router.get('/api/assets', assetController.getAllWithIRR);
+router.get('/api/assets/:assetId', assetController.getAssetById);
 
-router.post('/ativos/create', ativoController.createAtivo);
 
-router.post('/ativos/newtrade', ativoController.createTrade);
-router.post('/ativos/edit', ativoController.editAtivo);
-router.post('/ativos/edittrade', ativoController.editTrade);
+router.post('/ativos/create', assetController.createAtivo);
+
+router.post('/ativos/newtrade', assetController.createTrade);
+router.post('/ativos/edit', assetController.editAtivo);
+router.post('/ativos/edittrade', assetController.editTrade);
 
 var goalController = require('../controllers/goalController');
 router.get( '/goals/', goalController.index);

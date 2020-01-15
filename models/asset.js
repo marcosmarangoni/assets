@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-//const user = mongoose.model('user', UserSchema);
 
 const Schema = mongoose.Schema;
-const AtivoSchema = new Schema(
+const AssetSchema = new Schema(
   {
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -31,7 +30,7 @@ const AtivoSchema = new Schema(
   }
 );
 
-AtivoSchema.methods.setInterval = function() {
+AssetSchema.methods.setInterval = function() {
   const tempNow = new Date();
   this.sum_in = 0;
   this.sum_out = 0;
@@ -56,7 +55,7 @@ AtivoSchema.methods.setInterval = function() {
   
   this.movements.push(
     {date: now,
-    tipo: "p" , 
+    kind: "p" , 
     value: this.patrimonio,
     interval: 0}
   );
@@ -64,13 +63,13 @@ AtivoSchema.methods.setInterval = function() {
   this.sum_in += this.patrimonio;
 };
 
-AtivoSchema.methods.sortMovements = function() {
+AssetSchema.methods.sortMovements = function() {
   this.movements.sort(function (mA, mB) {
     return (mA.date - mB.date);
   });
 };
 
-AtivoSchema.methods.setGuess = function () {
+AssetSchema.methods.setGuess = function () {
   //Calculo apenas com um minimo de 29 dias. (29/365) = ~ 0.08
   const min_interval = 0.08;
   let retorno = (this.sum_in / -this.sum_out);
@@ -79,18 +78,18 @@ AtivoSchema.methods.setGuess = function () {
   if( this.movements[0].interval < min_interval || this.movements.length == 2 ) { // Intervalo pequeno ou apenas 2 movimentos
     if( isNaN(retorno) || retorno<=0.01 ) { // sem saida ou sem entrada / prejuizo muito grande.
       console.log("Retorno da Merda - "+this.code);
-      this.guess = -0.99; 
+      this.irr = -0.99; 
     } else { // Calculo Simples
       console.log("Ret Simples Oper: "+this.movements.length+" Taxa:"+(Math.pow(retorno,(1/Math.max(min_interval,this.movements[0].interval)))-1)+" "+this.codigo);
-      this.guess =(Math.pow(retorno,(1/Math.max(min_interval,this.movements[0].interval)))-1);
+      this.irr =(Math.pow(retorno,(1/Math.max(min_interval,this.movements[0].interval)))-1);
     } 
   } else { 
-    if( isNaN(this.guess) ) { this.guess = retorno; }
+    if( isNaN(this.irr) ) { this.irr = retorno; }
     this.setIRR(); 
   }
 };
 
-AtivoSchema.methods.setIRR = function() {
+AssetSchema.methods.setIRR = function() {
   
   var i=0;
   var vp_second = 0;
@@ -100,18 +99,18 @@ AtivoSchema.methods.setIRR = function() {
 
   do {
     // Seguranca do Guess
-    if((this.guess > 2 && i==0) || (this.guess < -0.5 && i==0) || isNaN(this.guess)) { // Maior que 200% ou menor que -50%
-      this.guess = 0.1 * i;
+    if((this.irr > 2 && i==0) || (this.irr < -0.5 && i==0) || isNaN(this.irr)) { // Maior que 200% ou menor que -50%
+      this.irr = 0.1 * i;
     } 
     ++i;
     vp_all = this.checkVP();
     
     if(isNaN(vp_all)) {
-      this.guess = 0;
+      this.irr = 0;
       vp_all = this.checkVP();
       if(isNaN(vp_all)) {
         i = 100;
-        this.guess = 0;
+        this.irr = 0;
         break;
       }
     }
@@ -119,29 +118,29 @@ AtivoSchema.methods.setIRR = function() {
     vp_third = vp_second;
     guess_third = guess_second;
     vp_second = vp_all;
-    guess_second = this.guess;
+    guess_second = this.irr;
     
     if(i>=6) {
       if(Math.abs(vp_all) > Math.abs(vp_second) || Math.abs(vp_second) > Math.abs(vp_third)) {
         // Nao estou aproximando do Zero, provavelmente o IRR e impossivel
         i = 100;
-        this.guess = 0;
+        this.irr = 0;
         break;
       }
     }
 
-    console.log('Try: '+i+' VP: '+vp_all.toFixed(4) + ' Guess: '+this.guess.toFixed(8)+' IN:'+this.sum_in+' COD: '+this.codigo);
+    console.log('Try: '+i+' VP: '+vp_all.toFixed(4) + ' Guess: '+this.irr.toFixed(8)+' IN:'+this.sum_in+' COD: '+this.codigo);
     
     if(vp_third!=0) {
-      this.guess = guess_second - (((guess_third - guess_second) * vp_second) / (vp_third - vp_second));
+      this.irr = guess_second - (((guess_third - guess_second) * vp_second) / (vp_third - vp_second));
 
-      console.log('New Gues by Interpolation: '+this.guess);
+      console.log('New Gues by Interpolation: '+this.irr);
       console.log('Used -> Gues_Sec: '+guess_second+' Guess_Third: '+guess_third);
       console.log('Used -> Vp_Sec: '+vp_second+' VP_Third: '+vp_third);
 
     } else {
-      this.guess += (vp_all/this.sum_in);
-      console.log('New Gues by else '+this.guess);
+      this.irr += (vp_all/this.sum_in);
+      console.log('New Gues by else '+this.irr);
     } 
     
 
@@ -149,19 +148,19 @@ AtivoSchema.methods.setIRR = function() {
     console.log('\n');
   
   } while (Math.abs(vp_all) > 0.01 &&  i < 100);
-  console.log('IRR: '+Number(this.guess*100).toFixed(2)+'% Try:'+i );
+  console.log('IRR: '+Number(this.irr*100).toFixed(2)+'% Try:'+i );
 }
 
-AtivoSchema.methods.checkVP = function() {
+AssetSchema.methods.checkVP = function() {
   let sum = 0;
-  guessPlusOne = (this.guess + 1);
+  guessPlusOne = (this.irr + 1);
   this.movements.forEach(element => {
     sum += element.value * Math.pow( (guessPlusOne) , element.interval );
   });
   return sum;
 }
 
-AtivoSchema.virtual('patrimonio').get(function() {
+AssetSchema.virtual('patrimonio').get(function() {
   return Number(this.balance * this.unit);
 }).
 set(function(v) {
@@ -169,7 +168,7 @@ set(function(v) {
   this.unitario = v;
 });
 
-AtivoSchema.set('toJSON', { getters: true, virtuals: true });
+AssetSchema.set('toJSON', { getters: true, virtuals: true });
 
 
-module.exports = mongoose.model('ativo', AtivoSchema);
+module.exports = mongoose.model('asset', AssetSchema);
