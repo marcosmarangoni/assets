@@ -9,22 +9,22 @@ const AtivoSchema = new Schema(
       required: [true, 'Um User e necessario'],
       ref: 'user',
     },
-    codigo: { type: String, required: [true, 'Um codigo e necessario'],
+    code: { type: String, required: [true, 'Um codigo e necessario'],
       max: [20, 'Sorry you reached the maximum number of characters'] },
-    saldo:    {type: Number },
-    unitario: {type: Number },
-    guess:    { type: Number },
-    class :{
+    balance:    {type: Number },
+    unit: {type: Number },
+    irr: { type: Number },
+    group :{
       type: Object,
-      c1: {type: String},
-      c2: {type: String},
-      c3: {type: String},
+      group_a: {type: String},
+      group_b: {type: String},
+      group_c: {type: String},
     },
-    trades: [{
+    movements: [{
       type: Object,
-      trade_id: { type: mongoose.Schema.Types.ObjectId, required: [true, 'Um codigo e necessario'] },
+      mov_id: { type: mongoose.Schema.Types.ObjectId, required: [true, 'Um codigo e necessario'] },
       date:     { type: Date }, // YYYY-MM-DD
-      tipo:     { type: String },
+      kind:     { type: String },
       value:    { type: Number },
       comment:  { type: String, max: [40, 'Sorry you reached the maximum number of characters'] },
     }],
@@ -41,20 +41,20 @@ AtivoSchema.methods.setInterval = function() {
   const daysonthisyear = Math.ceil((now - new Date(currentyear, 0 ,1 , 0, 0, 0, 0))/ milionaday );
   let dateArr, daystonextyear;
 
-  for(let x=0; x < this.trades.length; ++x) {
-    if(typeof this.trades[x].date=='string') {
-      dateArr = this.trades[x].date.split('-');
-      this.trades[x].date = new Date(dateArr[0], dateArr[1]-1, dateArr[2], 0,0,0,0);
+  for(let x=0; x < this.movements.length; ++x) {
+    if(typeof this.movements[x].date=='string') {
+      dateArr = this.movements[x].date.split('-');
+      this.movements[x].date = new Date(dateArr[0], dateArr[1]-1, dateArr[2], 0,0,0,0);
     }   
-    daystonextyear = Math.ceil((new Date((this.trades[x].date.getFullYear()+1) , 0 , 1, 0, 0, 0, 0) - this.trades[x].date) / milionaday);
-    this.trades[x].interval = (currentyear - this.trades[x].date.getFullYear()) + ((daysonthisyear + daystonextyear)/365) - 1;
-    if(this.trades[x].value > 0) {this.sum_in += this.trades[x].value;} else {this.sum_out += this.trades[x].value;}
+    daystonextyear = Math.ceil((new Date((this.movements[x].date.getFullYear()+1) , 0 , 1, 0, 0, 0, 0) - this.movements[x].date) / milionaday);
+    this.movements[x].interval = (currentyear - this.movements[x].date.getFullYear()) + ((daysonthisyear + daystonextyear)/365) - 1;
+    if(this.movements[x].value > 0) {this.sum_in += this.movements[x].value;} else {this.sum_out += this.movements[x].value;}
   }
   
   
   //this.set('patrimonio', Number(this.unitario * this.saldo), { strict: false });
   
-  this.trades.push(
+  this.movements.push(
     {date: now,
     tipo: "p" , 
     value: this.patrimonio,
@@ -64,9 +64,9 @@ AtivoSchema.methods.setInterval = function() {
   this.sum_in += this.patrimonio;
 };
 
-AtivoSchema.methods.sortTrades = function() {
-  this.trades.sort(function (tA, tB) {
-    return (tA.date - tB.date);
+AtivoSchema.methods.sortMovements = function() {
+  this.movements.sort(function (mA, mB) {
+    return (mA.date - mB.date);
   });
 };
 
@@ -76,21 +76,21 @@ AtivoSchema.methods.setGuess = function () {
   let retorno = (this.sum_in / -this.sum_out);
   //console.log(retorno);
 
-  if( this.trades[0].interval < min_interval || this.trades.length == 2 ) { // Intervalo pequeno ou apenas 2 movimentos
+  if( this.movements[0].interval < min_interval || this.movements.length == 2 ) { // Intervalo pequeno ou apenas 2 movimentos
     if( isNaN(retorno) || retorno<=0.01 ) { // sem saida ou sem entrada / prejuizo muito grande.
-      console.log("Retorno da Merda - "+this.codigo);
+      console.log("Retorno da Merda - "+this.code);
       this.guess = -0.99; 
     } else { // Calculo Simples
-      console.log("Ret Simples Oper: "+this.trades.length+" Taxa:"+(Math.pow(retorno,(1/Math.max(min_interval,this.trades[0].interval)))-1)+" "+this.codigo);
-      this.guess =(Math.pow(retorno,(1/Math.max(min_interval,this.trades[0].interval)))-1);
+      console.log("Ret Simples Oper: "+this.movements.length+" Taxa:"+(Math.pow(retorno,(1/Math.max(min_interval,this.movements[0].interval)))-1)+" "+this.codigo);
+      this.guess =(Math.pow(retorno,(1/Math.max(min_interval,this.movements[0].interval)))-1);
     } 
   } else { 
     if( isNaN(this.guess) ) { this.guess = retorno; }
-    this.irr(); 
+    this.setIRR(); 
   }
 };
 
-AtivoSchema.methods.irr = function() {
+AtivoSchema.methods.setIRR = function() {
   
   var i=0;
   var vp_second = 0;
@@ -155,14 +155,14 @@ AtivoSchema.methods.irr = function() {
 AtivoSchema.methods.checkVP = function() {
   let sum = 0;
   guessPlusOne = (this.guess + 1);
-  this.trades.forEach(element => {
+  this.movements.forEach(element => {
     sum += element.value * Math.pow( (guessPlusOne) , element.interval );
   });
   return sum;
 }
 
 AtivoSchema.virtual('patrimonio').get(function() {
-  return Number(this.saldo * this.unitario);
+  return Number(this.balance * this.unit);
 }).
 set(function(v) {
   this.saldo = 1;

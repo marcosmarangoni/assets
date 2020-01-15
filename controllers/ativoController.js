@@ -1,4 +1,4 @@
-let Return = require('../services/yreturn');
+//let Return = require('../services/yreturn');
 const Ativo = require('../models/ativo');
 let mongoose = require('mongoose');
 const async = require('async');
@@ -7,15 +7,15 @@ const User = require('../models/user');
 // Temporary:
 
 let user;
-async.waterfall([
+/*async.waterfall([
     function(cb) {
         User.findOne({email:"cesar.reboucas@gmail.com"}).select({"stats.return":1 }).lean().exec(cb);
     }],
     function (err, results) {
         if(err) {console.log(err);}
         user = results;
-});
-//user = {_id : "5bf25f5e94e80e2d58623e2a", stats: {return: 15 }};
+});*/
+user = {_id : "5bf25f5e94e80e2d58623e2a", stats: {return: 15 }};
 
 /************************************************************
  * 
@@ -27,7 +27,7 @@ async function indexList(request, response) {
     let Ativos = await Ativo.find({user_id: user._id}).sort('codigo').collation({locale: "en", strength: 1});
     for(let x = 0; x < Ativos.length ; ++x) {
         Ativos[x].setInterval();
-        Ativos[x].sortTrades();
+        Ativos[x].sortMovements();
         Ativos[x].setGuess();
         
         //AtivoTotal.trades = AtivoTotal.trades.concat(Ativos[x].trades);
