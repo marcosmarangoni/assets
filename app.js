@@ -18,8 +18,6 @@ const cors = require('cors');
 
 // Create the index routes
 const indexRouter = require('./routes/index');
-// Users routes
-const usersRouter = require('./routes/users');
 
 const app = express();
 app.use(cors());
@@ -34,7 +32,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify',false);
 
-// Set up handlebars
+// Set up handlebars view engine
 app.engine('hbs', hbs({
   defaultLayout: 'layout',
   layoutsDir: path.join(__dirname, 'views', 'layouts'),
@@ -63,7 +61,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Set up routes
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,5 +1,25 @@
 const express = require('express');
 const router = express.Router();
+const bodyParser = require('body-parser');
+
+const userController = require('../controllers/userController');
+const apiUserController = require('../controllers/apiUserController');
+
+const ativoController = require('../controllers/ativoController');
+
+/*********** User Routes *************/
+//router.get('/', userController.signUp);
+//router.get('/signUp', userController.signUp);
+/****************************************/
+
+/*********** API User Routes *************/
+router.post('/api/signup', bodyParser.urlencoded({ extended: false }), apiUserController.signUp);
+router.post('/api/login', bodyParser.urlencoded({ extended: false }), apiUserController.logIn);
+router.get('/api/users/list', apiUserController.list);
+router.get('/api/users/read/:id', apiUserController.read);
+router.put('/api/users/update/:id', apiUserController.update);
+router.delete('/api/users/remove/:id', apiUserController.remove);
+/****************************************/
 
 /* GET home page. */
 router.get('/', function (req, res) {
@@ -9,7 +29,6 @@ router.get('/form', function (req, res) {
     res.render('home/form');
 });
 
-var ativoController = require('../controllers/ativoController');
 router.get( '/ativos', ativoController.index);
 router.get('/api/ativos', ativoController.indexList);
 
