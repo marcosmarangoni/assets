@@ -4,7 +4,7 @@ let mongoose = require('mongoose');
 const User = require('../models/user');
 
 async function getAllAssets(request, response) {
-    let Assets = await Asset.find().sort('code').collation({locale: "en", strength: 1});    
+    let Assets = await Asset.find({ user_id: request.user.id }).sort('code').collation({locale: "en", strength: 1});    
     AssetTotal = new Asset();
     if(request.query.irr!==undefined && request.query.irr==='1') {
         AssetTotal = new Asset();

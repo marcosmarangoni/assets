@@ -44,9 +44,6 @@ const UserSchema = new Schema(
         },
         max: [30, 'Sorry you reached the maximum number of characters'],
       },
-      secret_key: {
-          type: String,
-      },
       forgot_password_token: {
         type: String,
       },
