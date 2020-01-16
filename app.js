@@ -24,7 +24,8 @@ app.use(cors());
 
 // Set up mongoose connection
 const mongoose = require('mongoose');
-const mongoDB = 'mongodb://marangoni:m4r4ng0n1@ds045107.mlab.com:45107/node-assets';
+mongoose.set('useUnifiedTopology', true);
+const mongoDB = 'mongodb://nodeapi:a123456789@ds045107.mlab.com:45107/node-assets';
 mongoose.connect(mongoDB, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 const db = mongoose.connection;
