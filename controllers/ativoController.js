@@ -1,22 +1,7 @@
 let Return = require('../services/yreturn');
 const Ativo = require('../models/ativo');
 let mongoose = require('mongoose');
-const async = require('async');
 const User = require('../models/user');
-
-// Temporary:
-
-let user;
-async.waterfall([
-    function(cb) {
-        User.findOne({email:"cesar.reboucas@gmail.com"}).select({"stats.return":1 }).lean().exec(cb);
-    }],
-    function (err, results) {
-        if(err) {console.log(err);}
-        user = results;
-});
-
-//user = {_id : "5bf25f5e94e80e2d58623e2a", stats: {return: 15 }};
 
 
 /************************************************************
@@ -36,36 +21,13 @@ async function index(request, response) {
  */
 async function indexList(request, response) {
     //Total Ativos not used anymore
-    let Ativos = await Ativo.find({user_id: user._id}).sort('codigo').collation({locale: "en", strength: 1});
-    for(let x = 0; x < Ativos.length ; ++x) {
-        Ativos[x].setInterval();
-        Ativos[x].sortTrades();
-        Ativos[x].setGuess();
-        
-        //AtivoTotal.trades = AtivoTotal.trades.concat(Ativos[x].trades);
-        //AtivoTotal.patrimonio += Ativos[x].patrimonio;
+    let ativos = await Ativo.find().sort('codigo');
+    for(let x = 0; x < ativos.length ; ++x) {
+        ativos[x].setInterval();
+        ativos[x].sortTrades();
+        ativos[x].setGuess();
     }
-    
-    /*let TotalAtivos = { trades:new Array() };
-    
-    let patrimonio, patriminioTotal=0;
-    AtivoTotal = new Ativo();
-    AtivoTotal.patrimonio = 0;
-    
-    AtivoTotal.sum_in = 0;
-    AtivoTotal.sum_out = 0;
-    AtivoTotal.trades.forEach(td => {
-        if(td.value > 0) {AtivoTotal.sum_in += td.value;} else {AtivoTotal.sum_out += td.value;}    
-    });
-    
-    AtivoTotal.guess = user.stats.return;
-    AtivoTotal.setGuess();
-
-    await User.findOneAndUpdate({_id: user._id}, 
-        {"stats.assetamt": AtivoTotal.patrimonio, "stats.return": AtivoTotal.guess}); 
-    */
-    response.json(Ativos);
-    
+    response.send(ativos);
 }
 
 /************************************************************
