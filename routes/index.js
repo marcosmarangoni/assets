@@ -11,7 +11,7 @@ router.get('/form', function (req, res) {
 
 var assetController = require('../controllers/assetController');
 
-router.get('/api/assets', assetController.getAllWithIRR);
+router.get('/api/assets', assetController.getAllAssets);
 router.get('/api/assets/:assetId', assetController.getAssetById);
 
 

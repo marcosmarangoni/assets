@@ -17,22 +17,39 @@ let user;
 });*/
 user = {_id : "5bf25f5e94e80e2d58623e2a", stats: {return: 15 }};
 
-async function getAllWithIRR(request, response) {
-    //Total Ativos not used anymore
+async function getAllAssets(request, response) {
     let Assets = await Asset.find({user_id: user._id}).sort('code').collation({locale: "en", strength: 1});    
-    for(let x = 0; x < Assets.length ; ++x) {
-        Assets[x].setInterval();
-        Assets[x].sortMovements();
-        Assets[x].setGuess();
+    AssetTotal = new Asset();
+    if(request.query.irr!==undefined && request.query.irr==='1') {
+        AssetTotal = new Asset();
+        AssetTotal.unit = 0;
+        AssetTotal.balance = 1;
+        AssetTotal.sum_in = 0;
+        AssetTotal.sum_out = 0;
+        for(let x = 0; x < Assets.length ; ++x) {
+            Assets[x].setInterval();
+            Assets[x].sortMovements();
+            Assets[x].setGuess();
+            // Building AssetTotal
+            Assets[x].movements.forEach(movement => {
+                AssetTotal.movements.push(movement);
+            });
+            AssetTotal.unit += Assets[x].total;
+            AssetTotal.sum_in += Assets[x].sum_in;
+            AssetTotal.sum_out += Assets[x].sum_out;
+        }
+        AssetTotal.setGuess();
+        //Excluding movements before send.
+        AssetTotal.movements = [];
     }
-    response.json(Assets);
+    response.json({assets: Assets, asset_total: AssetTotal});
 }
-
 
 async function getAssetById(request,response) {
     let asset = await Asset.find({user_id: user._id, _id:request.params.assetId});
     response.json(asset[0]);
 }
+
 
 /************************************************************
  * 
@@ -151,7 +168,7 @@ async function editAtivo(request, response) {
 
 module.exports = {
     /*Revised*/
-    getAllWithIRR,
+    getAllAssets,
     getAssetById,
 
     createAtivo,
