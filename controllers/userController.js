@@ -2,6 +2,29 @@ const User = require('../models/user');
 const securityService = require('../services/securityService');
 
 /**
+ * Middleware to authenticate the user with JWT
+ * It appends the user to the request (request.user)
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+async function authenticate(req, res, next) {
+  try {
+    if (!req.headers.authorization) {
+      return res.status(403).send({ message: 'No credentials sent!' });
+    }
+    const token = req.headers.authorization;
+    const decodedJWT = securityService.decodeJWT(token);
+    console.log(decodedJWT);
+    const user = await User.findOne({ username: decodedJWT.username });
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+}
+
+/**
  * POST - /api/signup
  * Handle the create user view form parameters.
  * @param {Request} request 
@@ -10,25 +33,19 @@ const securityService = require('../services/securityService');
  *          Return 500 (Server Error) if informations are not valid.
  */
 async function signUp(request, response) {
-
-  const secretKey = securityService.generateSecretKey();
-
   let userParams = {
     username: request.body.username,
     password: request.body.password,
     first_name: request.body.first_name,
-    last_name: request.body.last_name,
-    secret_key: secretKey
+    last_name: request.body.last_name
   };
   const user = new User(userParams);
   try {
     const savedUser = await user.save();
-    const { _id, username, password } = savedUser;
-    console.log('[SAVED USER]', savedUser);
-    let token = securityService.jwtSignIn(_id, username, secretKey);
+    const { _id, username } = savedUser;
+    let token = securityService.jwtSignIn(_id, username);
     response.send({ token });
   } catch (error) {
-    console.log('[ERROR]', error);
     response.status(500).send({ message: 'Erro ao tentar gravar o usuario' });
   }
 }
@@ -49,15 +66,10 @@ async function logIn(request, response) {
   };
   try {
     let encryptedPassword = securityService.encrypt(loginParams.password);
-    // JWT encryption key.
-    let secretKey = securityService.generateSecretKey();
-
     const user = await User.findOne({ username: loginParams.username });
     if (encryptedPassword === user.password) {
-      user.secret_key = secretKey;
-      await user.updateOne();
       const { _id, username, password } = user;
-      let token = securityService.jwtSignIn(_id, username, secretKey);
+      let token = securityService.jwtSignIn(_id, username);
       response.send({ token: token });
     }
     else throw new Error('Password doesnt match');
@@ -116,5 +128,6 @@ module.exports = {
   list,
   read,
   update,
-  remove
+  remove,
+  authenticate
 }

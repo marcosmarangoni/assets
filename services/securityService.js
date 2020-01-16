@@ -1,6 +1,7 @@
 // JSon Web Tokens, provide OAuth2 tokens for security
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const fs = require('fs');
 
 /**
  * Generate a secret key, or a random sized hex
@@ -17,19 +18,21 @@ function generateSecretKey(size = 48) {
  * @param {String} password 
  * @param {String} secretKey 
  */
-function jwtSignIn(id, username, secretKey) {
+function jwtSignIn(id, username) {
+  const assetsKey = fs.readFileSync(`${__dirname}/../assets.key`);
   let token = jwt.sign({
     id: id,
     username: username,
-  }, secretKey);
+  }, assetsKey);
   return token;
 }
 
-function jwtVerify(token, secretKey) {
+function decodeJWT(token) {
   try {
-    jwt.verify(token, secretKey)
-  } catch(error) {
-    throw 'Invalid token';
+    const assetsKey = fs.readFileSync(`${__dirname}/../assets.key`);
+    return jwt.verify(token, assetsKey);
+  } catch (error) {
+    throw error;
   }
 }
 
@@ -45,5 +48,5 @@ module.exports = {
   encrypt,
   generateSecretKey,
   jwtSignIn,
-  jwtVerify
+  decodeJWT
 }
