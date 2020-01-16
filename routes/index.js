@@ -3,7 +3,7 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 
 const userController = require('../controllers/userController');
-const ativoController = require('../controllers/ativoController');
+const assetController = require('../controllers/assetController');
 const goalController = require('../controllers/goalController');
 
 /*********** API User Routes *************/
@@ -16,13 +16,12 @@ router.delete('/api/users/remove/:id', userController.remove);
 /****************************************/
 
 /******** API Assets Routes *************/
-router.get( '/ativos', ativoController.index);
-router.get('/api/ativos', ativoController.indexList);
-router.get( '/ativos/create', ativoController.create);
-router.post('/ativos/create', ativoController.createAtivo);
-router.post('/ativos/newtrade', ativoController.createTrade);
-router.post('/ativos/edit', ativoController.editAtivo);
-router.post('/ativos/edittrade', ativoController.editTrade);
+router.get('/api/assets', assetController.getAllAssets);
+router.get('/api/assets/:assetId', assetController.getAssetById);
+router.post('/ativos/create', assetController.createAtivo);
+router.post('/ativos/newtrade', assetController.createTrade);
+router.post('/ativos/edit', assetController.editAtivo);
+router.post('/ativos/edittrade', assetController.editTrade);
 /****************************************/
 
 /******** API Goals Routes *************/
