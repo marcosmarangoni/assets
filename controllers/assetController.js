@@ -1,7 +1,7 @@
 //let Return = require('../services/yreturn');
 const Asset = require('../models/asset.js');
 let mongoose = require('mongoose');
-const User = require('../models/user');
+//const User = require('../models/user');
 
 async function getAllAssets(request, response) {
     let Assets = await Asset.find({ user_id: request.user.id }).sort('code').collation({locale: "en", strength: 1});    
@@ -32,7 +32,7 @@ async function getAllAssets(request, response) {
 }
 
 async function getAssetById(request,response) {
-    let asset = await Asset.find({user_id: user._id, _id:request.params.assetId});
+    let asset = await Asset.find({user_id: request.user.id, _id:request.params.assetId});
     response.json(asset[0]);
 }
 
