@@ -20,11 +20,11 @@ router.delete('/api/users/remove/:id', userController.authenticate, userControll
 
 /******** API Assets Routes *************/
 router.get('/api/assets', userController.authenticate ,assetController.getAllAssets);
-router.get('/api/assets/:assetId', userController.authenticate, assetController.getAssetById);
-router.post('/ativos/create', userController.authenticate, assetController.createAtivo);
-router.post('/ativos/newtrade', userController.authenticate, assetController.createTrade);
-router.post('/ativos/edit', userController.authenticate, assetController.editAtivo);
-router.post('/ativos/edittrade', userController.authenticate, assetController.editTrade);
+router.get('/api/assets/:asset', userController.authenticate, assetController.getAssetById);
+router.post('/api/assets', userController.authenticate, assetController.newAsset);
+router.post('/api/assets/movement', userController.authenticate, assetController.newMovement);
+router.put('/api/assets', userController.authenticate, assetController.editAsset);
+router.put('/api/assets/movement', userController.authenticate, assetController.editMovement);
 /****************************************/
 
 /******** API Goals Routes *************/

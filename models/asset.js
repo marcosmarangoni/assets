@@ -1,34 +1,29 @@
 const mongoose = require('mongoose');
-
+const {MovementSchema} = require('./movement.js');
+const {Movement} = require('./movement.js');
 const Schema = mongoose.Schema;
+
 const AssetSchema = new Schema(
   {
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      required: [true, 'Um User e necessario'],
+      required: [true, 'A valid user is necessary'],
       ref: 'user',
     },
     code: {
-      type: String, required: [true, 'Um codigo e necessario'],
+      type: String, required: [true, 'A code is necessary'],
       max: [20, 'Sorry you reached the maximum number of characters']
     },
-    balance: { type: Number },
-    unit: { type: Number },
-    irr: { type: Number },
+    autorefresh: {type: Boolean, default: false},
+    balance: {type: Number, default:0},
+    unit: {type: Number, default:0},
+    irr: Number,
     group: {
-      type: Object,
-      group_a: { type: String },
-      group_b: { type: String },
-      group_c: { type: String },
+      group_a: {type: String, default: ""},
+      group_b: {type: String, default: ""},
+      group_c: {type: String, default: ""},
     },
-    movements: [{
-      type: Object,
-      mov_id: { type: mongoose.Schema.Types.ObjectId, required: [true, 'Um codigo e necessario'] },
-      date: { type: Date }, // YYYY-MM-DD
-      kind: { type: String },
-      value: { type: Number },
-      comment: { type: String, max: [40, 'Sorry you reached the maximum number of characters'] },
-    }],
+    movements: [{type: MovementSchema, required: [true, "A movement is needed"]}],
   }
 );
 
@@ -52,17 +47,22 @@ AssetSchema.methods.setInterval = function () {
     if (this.movements[x].value > 0) { this.sum_in += this.movements[x].value; } else { this.sum_out += this.movements[x].value; }
   }
 
-
-
-
-  this.movements.push(
+  let totalMovement = new Movement({
+    date: now,
+    kind: "p",
+    value: this.total,
+    interval: 0
+  });
+  this.movements.push(totalMovement);
+  /*this.movements.push(
     {
       date: now,
       kind: "p",
       value: this.total,
       interval: 0
     }
-  );
+  );*/
+
   //console.log("This: "+this);
   this.sum_in += this.total;
 };
@@ -174,5 +174,7 @@ AssetSchema.virtual('total').get(function () {
 
 AssetSchema.set('toJSON', { getters: true, virtuals: true });
 
+//const Movement = mongoose.model('Movement', MovementSchema)
 
 module.exports = mongoose.model('asset', AssetSchema);
+
