@@ -54,16 +54,6 @@ AssetSchema.methods.setInterval = function () {
     interval: 0
   });
   this.movements.push(totalMovement);
-  /*this.movements.push(
-    {
-      date: now,
-      kind: "p",
-      value: this.total,
-      interval: 0
-    }
-  );*/
-
-  //console.log("This: "+this);
   this.sum_in += this.total;
 };
 

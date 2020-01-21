@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const MovementSchema = new Schema({
   /*mov_id: { type: mongoose.Schema.Types.ObjectId },*/
   date: {
-    type: String,
+    type: Date,
     required: [true, "We need a date for each Movement"],
     default: new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()
   }, // YYYY-MM-DD
