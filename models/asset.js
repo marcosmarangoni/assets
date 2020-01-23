@@ -28,31 +28,21 @@ const AssetSchema = new Schema(
 );
 
 AssetSchema.methods.setInterval = function () {
-  const tempNow = new Date();
   this.sum_in = 0;
   this.sum_out = 0;
-  const now = new Date(tempNow.getFullYear(), tempNow.getMonth(), tempNow.getDate(), 0, 0, 0, 0);
-  const currentyear = now.getFullYear();
-  const milionaday = 86400000 // 1000 * 60 * 60 * 24;
-  const daysonthisyear = Math.ceil((now - new Date(currentyear, 0, 1, 0, 0, 0, 0)) / milionaday);
-  let dateArr, daystonextyear;
-
+  
   for (let x = 0; x < this.movements.length; ++x) {
-    if (typeof this.movements[x].date == 'string') {
-      dateArr = this.movements[x].date.split('-');
-      this.movements[x].date = new Date(dateArr[0], dateArr[1] - 1, dateArr[2], 0, 0, 0, 0);
-    }
-    daystonextyear = Math.ceil((new Date((this.movements[x].date.getFullYear() + 1), 0, 1, 0, 0, 0, 0) - this.movements[x].date) / milionaday);
-    this.movements[x].interval = (currentyear - this.movements[x].date.getFullYear()) + ((daysonthisyear + daystonextyear) / 365) - 1;
     if (this.movements[x].value > 0) { this.sum_in += this.movements[x].value; } else { this.sum_out += this.movements[x].value; }
   }
 
+  const tempNow = new Date();
+  const now = new Date(tempNow.getUTCFullYear(), tempNow.getUTCMonth(), tempNow.getUTCDate(), 0, 0, 0, 0);
   let totalMovement = new Movement({
     date: now,
-    kind: "p",
-    value: this.total,
-    interval: 0
+    kind: "holdings",
+    value: this.total
   });
+  
   this.movements.push(totalMovement);
   this.sum_in += this.total;
 };
@@ -84,7 +74,6 @@ AssetSchema.methods.setGuess = function () {
 };
 
 AssetSchema.methods.setIRR = function () {
-
   var i = 0;
   var vp_second = 0;
   var guess_second = 0;
@@ -150,7 +139,9 @@ AssetSchema.methods.checkVP = function () {
   guessPlusOne = (this.irr + 1);
   this.movements.forEach(element => {
     sum += element.value * Math.pow((guessPlusOne), element.interval);
+    console.log(element.value + " <-> "+element.interval+" <-> "+element.kind);
   });
+  //console.log(sum)
   return sum;
 }
 

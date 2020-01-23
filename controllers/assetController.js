@@ -129,7 +129,6 @@ async function editAsset(request, response) {
             group_c: request.body.group_c,
         },
     };
-
     try {
         let asset = await Asset.findOneAndUpdate({ user_id: request.user.id, _id: request.body.asset }, {
             $set: partialAsset
@@ -175,7 +174,6 @@ async function editMovement(request, response) {
         }
 
     }
-    //response.redirect('/ativos');
 }
 
 
