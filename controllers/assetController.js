@@ -7,7 +7,7 @@ let mongoose = require('mongoose');
 // Get a list of assets with or without IRR and a AssetsSumary
 async function getAllAssets(request, response) {
     let Assets = await Asset.find({ user_id: request.user.id }).sort('code').collation({ locale: "en", strength: 1 });
-    AssetTotal = new Asset();
+    let AssetTotal = new Asset();
     if (request.query.irr !== undefined && request.query.irr === '1') {
         AssetTotal = new Asset();
         AssetTotal.unit = 0;
@@ -45,7 +45,7 @@ async function getAssetById(request, response) {
 async function newAsset(request, response) {
 
     let value = request.body.value;
-    if (request.body.kind === "buy") {
+    if (request.body.kind === 'buy') {
         value *= -1;
     }
 
@@ -153,7 +153,7 @@ async function editMovement(request, response) {
     } else {
 
         const partialMovement = {
-            date: request.body.date,
+            date: new Date(request.body.date),
             kind: request.body.kind,
             value: Number(request.body.value),
             comment: request.body.comment,
