@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const {MovementSchema} = require('./movement.js');
-const {Movement} = require('./movement.js');
+const { MovementSchema } = require('./movement.js');
+const { Movement } = require('./movement.js');
 const Schema = mongoose.Schema;
 
 const AssetSchema = new Schema(
@@ -14,16 +14,16 @@ const AssetSchema = new Schema(
       type: String, required: [true, 'A code is necessary'],
       max: [20, 'Sorry you reached the maximum number of characters']
     },
-    autorefresh: {type: Boolean, default: false},
-    balance: {type: Number, default:0},
-    unit: {type: Number, default:0},
+    autorefresh: { type: Boolean, default: false },
+    balance: { type: Number, default : 0 },
+    unit: { type: Number, default: 0 },
     irr: Number,
     group: {
-      group_a: {type: String, default: ""},
-      group_b: {type: String, default: ""},
-      group_c: {type: String, default: ""},
+      group_a: { type: String, default: '' },
+      group_b: { type: String, default: '' },
+      group_c: { type: String, default: '' },
     },
-    movements: [{type: MovementSchema, required: [true, "A movement is needed"]}],
+    movements: [{ type: MovementSchema, required: [true, 'A movement is needed'] }],
   }
 );
 
@@ -39,7 +39,7 @@ AssetSchema.methods.setInterval = function () {
   const now = new Date(tempNow.getUTCFullYear(), tempNow.getUTCMonth(), tempNow.getUTCDate(), 0, 0, 0, 0);
   let totalMovement = new Movement({
     date: now,
-    kind: "holdings",
+    kind: 'holdings',
     value: this.total
   });
   
@@ -59,12 +59,12 @@ AssetSchema.methods.setGuess = function () {
   let retorno = (this.sum_in / -this.sum_out);
   //console.log(retorno);
 
-  if (this.movements[0].interval < min_interval || this.movements.length == 2) { // Intervalo pequeno ou apenas 2 movimentos
+  if (this.movements[0].interval < min_interval || this.movements.length === 2) { // Intervalo pequeno ou apenas 2 movimentos
     if (isNaN(retorno) || retorno <= 0.01) { // sem saida ou sem entrada / prejuizo muito grande.
-      console.log("Retorno da Merda - " + this.code);
+      console.log('Retorno da Merda - ' + this.code);
       this.irr = -0.99;
     } else { // Calculo Simples
-      console.log("Ret Simples Oper: " + this.movements.length + " Taxa:" + (Math.pow(retorno, (1 / Math.max(min_interval, this.movements[0].interval))) - 1) + " " + this.codigo);
+      console.log('Ret Simples Oper: ' + this.movements.length + ' Taxa:' + (Math.pow(retorno, (1 / Math.max(min_interval, this.movements[0].interval))) - 1) + ' ' + this.codigo);
       this.irr = (Math.pow(retorno, (1 / Math.max(min_interval, this.movements[0].interval))) - 1);
     }
   } else {
@@ -74,15 +74,16 @@ AssetSchema.methods.setGuess = function () {
 };
 
 AssetSchema.methods.setIRR = function () {
-  var i = 0;
-  var vp_second = 0;
-  var guess_second = 0;
-  var vp_third = 0;
-  var guess_third = 0;
+  let i = 0;
+  let vp_all = 0;
+  let vp_second = 0;
+  let guess_second = 0;
+  let vp_third = 0;
+  let guess_third = 0;
 
   do {
     // Seguranca do Guess
-    if ((this.irr > 2 && i == 0) || (this.irr < -0.5 && i == 0) || isNaN(this.irr)) { // Maior que 200% ou menor que -50%
+    if ((this.irr > 2 && i === 0) || (this.irr < -0.5 && i === 0) || isNaN(this.irr)) { // Maior que 200% ou menor que -50%
       this.irr = 0.1 * i;
     }
     ++i;
@@ -114,7 +115,7 @@ AssetSchema.methods.setIRR = function () {
 
     console.log('Try: ' + i + ' VP: ' + vp_all.toFixed(4) + ' Guess: ' + this.irr.toFixed(8) + ' IN:' + this.sum_in + ' COD: ' + this.codigo);
 
-    if (vp_third != 0) {
+    if (vp_third !== 0) {
       this.irr = guess_second - (((guess_third - guess_second) * vp_second) / (vp_third - vp_second));
 
       console.log('New Gues by Interpolation: ' + this.irr);
@@ -132,18 +133,18 @@ AssetSchema.methods.setIRR = function () {
 
   } while (Math.abs(vp_all) > 0.01 && i < 100);
   console.log('IRR: ' + Number(this.irr * 100).toFixed(2) + '% Try:' + i);
-}
+};
 
 AssetSchema.methods.checkVP = function () {
   let sum = 0;
-  guessPlusOne = (this.irr + 1);
+  let guessPlusOne = (this.irr + 1);
   this.movements.forEach(element => {
     sum += element.value * Math.pow((guessPlusOne), element.interval);
-    console.log(element.value + " <-> "+element.interval+" <-> "+element.kind);
+    console.log(element.value + ' <-> '+element.interval+' <-> '+element.kind);
   });
   //console.log(sum)
   return sum;
-}
+};
 
 AssetSchema.virtual('total').get(function () {
   return Number(this.balance * this.unit);
@@ -154,8 +155,6 @@ AssetSchema.virtual('total').get(function () {
   });
 
 AssetSchema.set('toJSON', { getters: true, virtuals: true });
-
-//const Movement = mongoose.model('Movement', MovementSchema)
 
 module.exports = mongoose.model('asset', AssetSchema);
 
