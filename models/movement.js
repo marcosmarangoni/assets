@@ -30,8 +30,8 @@ MovementSchema.virtual('interval').get( function() {
 
   const today = momentjs().hour(0).minute(0).second(0);
   const movementDate = momentjs(this.date);
-  console.log(movementDate.format());
-  console.log('DURATION', momentjs.duration(today.diff(movementDate)).asYears());
+  //console.log(movementDate.format());
+  //console.log('DURATION', momentjs.duration(today.diff(movementDate)).asYears());
 
   const currentyear = now.getUTCFullYear();
   //console.log(tempNow);

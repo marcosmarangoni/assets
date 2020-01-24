@@ -151,7 +151,7 @@ async function editMovement(request, response) {
         //await Ativo.findOneAndUpdate({ _id: id }, { $pull: { trades: { trade_id: mongoose.Types.ObjectId(tradeid) } } });
 
     } else {
-
+        console.log(request.body.date);
         const partialMovement = {
             date: new Date(request.body.date),
             kind: request.body.kind,
