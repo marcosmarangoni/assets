@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const moment = require('moment');
 const { MovementSchema } = require('./movement.js');
 const { Movement } = require('./movement.js');
+const momentjs = require('moment');
 const Schema = mongoose.Schema;
 
 const AssetSchema = new Schema(
@@ -28,33 +29,6 @@ const AssetSchema = new Schema(
   }
 );
 
-/**
- * This function sets the period between movements
- */
-AssetSchema.methods.setInterval = function() {
-  this.sum_in = 0;
-  this.sum_out = 0;
-  
-  for (let x = 0; x < this.movements.length; ++x) {
-    if (this.movements[x].value > 0) { 
-      this.sum_in += this.movements[x].value; 
-    } else { 
-      this.sum_out += this.movements[x].value; 
-    }
-  }
-
-  const tempNow = new Date();
-  const now = new Date(tempNow.getUTCFullYear(), tempNow.getUTCMonth(), tempNow.getUTCDate(), 0, 0, 0, 0);
-  let totalMovement = new Movement({
-    date: now,
-    kind: 'holdings',
-    value: this.total
-  });
-  
-  this.movements.push(totalMovement);
-  this.sum_in += this.total;
-};
-
 AssetSchema.methods.sortMovements = function () {
   this.movements.sort(function (mA, mB) {
     return (mA.date - mB.date);
@@ -62,6 +36,31 @@ AssetSchema.methods.sortMovements = function () {
 };
 
 AssetSchema.methods.setGuess = function () {
+  //Preparation
+  this.sum_in = 0;
+  this.sum_out = 0;
+
+  for (let x = 0; x < this.movements.length; ++x) {
+    if (this.movements[x].value > 0) { 
+      this.sum_in += this.movements[x].value; 
+    } else { 
+      this.sum_out += this.movements[x].value; 
+    }
+  }
+  
+  let today = momentjs().startOf('d');
+  today.add(momentjs().utcOffset(), 'm'); // utcOffset is negative to Vancouver, Removing 8 hours.
+  today.utcOffset(0);// Bringing to UTC
+
+  let totalMovement = new Movement({
+    date: today.toDate(),
+    kind: 'holdings',
+    value: this.total
+  });  
+  this.movements.push(totalMovement);
+  this.sum_in += this.total;
+  //End of Preparation
+
   //Calculo apenas com um minimo de 29 dias. (29/365) = ~ 0.08
   const min_interval = 0.08;
   let retorno = (this.sum_in / -this.sum_out);
@@ -148,7 +147,7 @@ AssetSchema.methods.checkVP = function () {
   let guessPlusOne = (this.irr + 1);
   this.movements.forEach(element => {
     sum += element.value * Math.pow((guessPlusOne), element.interval);
-    console.log(element.value + ' <-> '+element.interval+' <-> '+element.kind);
+    //console.log(element.value + ' <-> '+element.interval+' <-> '+element.kind);
   });
   //console.log(sum)
   return sum;

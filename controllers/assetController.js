@@ -20,7 +20,7 @@ async function getAllAssets(request, response) {
         AssetTotal.sum_in = 0;
         AssetTotal.sum_out = 0;
         for (let x = 0; x < Assets.length; ++x) {
-            Assets[x].setInterval();
+            //Assets[x].setInterval();
             Assets[x].sortMovements();
             Assets[x].setGuess();
             // Building AssetTotal
@@ -156,7 +156,7 @@ async function editMovement(request, response) {
         //await Ativo.findOneAndUpdate({ _id: id }, { $pull: { trades: { trade_id: mongoose.Types.ObjectId(tradeid) } } });
 
     } else {
-
+        console.log(request.body.date);
         const partialMovement = {
             date: new Date(request.body.date),
             kind: request.body.kind,
