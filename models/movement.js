@@ -28,7 +28,7 @@ MovementSchema.virtual('interval').get( function() {
   //const tempNow = new Date();
   const now = new Date();
 
-  const today = momentjs().hour(0).minute(0).second(0);
+  const today = momentjs().format("YYYY-MM-DD");
   const movementDate = momentjs(this.date);
   console.log(movementDate.format());
   console.log('DURATION', momentjs.duration(today.diff(movementDate)).asYears());

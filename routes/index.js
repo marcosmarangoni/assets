@@ -36,6 +36,8 @@ router.post('/goals/:goalID', userController.authenticate, goalController.ShowGo
 router.get('/goalsDEBUG/:goalID', userController.authenticate, goalController.ShowGoalData);
 /****************************************/
 
+router.get('/testing', assetController.testing);
+
 router.get('/seed', async (req,res) => {
     try {
         let andre = new User();

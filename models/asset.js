@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 const { MovementSchema } = require('./movement.js');
 const { Movement } = require('./movement.js');
 const Schema = mongoose.Schema;
@@ -27,12 +28,19 @@ const AssetSchema = new Schema(
   }
 );
 
-AssetSchema.methods.setInterval = function () {
+/**
+ * This function sets the period between movements
+ */
+AssetSchema.methods.setInterval = function() {
   this.sum_in = 0;
   this.sum_out = 0;
   
   for (let x = 0; x < this.movements.length; ++x) {
-    if (this.movements[x].value > 0) { this.sum_in += this.movements[x].value; } else { this.sum_out += this.movements[x].value; }
+    if (this.movements[x].value > 0) { 
+      this.sum_in += this.movements[x].value; 
+    } else { 
+      this.sum_out += this.movements[x].value; 
+    }
   }
 
   const tempNow = new Date();
