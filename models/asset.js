@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 const { MovementSchema } = require('./movement.js');
 const { Movement } = require('./movement.js');
 const momentjs = require('moment');
@@ -40,7 +41,11 @@ AssetSchema.methods.setGuess = function () {
   this.sum_out = 0;
 
   for (let x = 0; x < this.movements.length; ++x) {
-    if (this.movements[x].value > 0) { this.sum_in += this.movements[x].value; } else { this.sum_out += this.movements[x].value; }
+    if (this.movements[x].value > 0) { 
+      this.sum_in += this.movements[x].value; 
+    } else { 
+      this.sum_out += this.movements[x].value; 
+    }
   }
   
   let today = momentjs().startOf('d');

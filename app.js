@@ -1,3 +1,7 @@
+/*
+API ALPHA VANTAGE: 7M2GANU4CTO5UTMU
+*/
+
 // Helpers for errors
 const createError = require('http-errors');
 // Express framework
@@ -12,12 +16,13 @@ const logger = require('morgan');
 const hbs = require('express-handlebars');
 // CSS compiler
 const sassMiddleware = require('node-sass-middleware');
-
 //CORS
 const cors = require('cors');
-
 // Create the index routes
 const indexRouter = require('./routes/index');
+// Cron jobs
+const cron = require('node-cron');
+const alphaVantage = require('./services/alphaVantageWorker');
 
 const app = express();
 app.use(cors());
@@ -78,5 +83,20 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('layouts/error');
 });
+
+/**
+ # ┌────────────── second (optional)
+ # │ ┌──────────── minute
+ # │ │ ┌────────── hour
+ # │ │ │ ┌──────── day of month
+ # │ │ │ │ ┌────── month
+ # │ │ │ │ │ ┌──── day of week
+ # │ │ │ │ │ │
+ # │ │ │ │ │ │
+ # * * * * * *
+ */
+cron.schedule('*/2 * * * *', () => {
+  alphaVantage.updateQuotes();
+})
 
 module.exports = app;
