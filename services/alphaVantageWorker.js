@@ -3,50 +3,67 @@ const assetSchema = require('../models/asset');
 const axios = require('axios');
 const mongoose = require('mongoose');
 
+// ================
+// HELPER FUNCTIONS
+// ================
+function throwError(apiResponseData) {
+    for (const key in apiResponseData) {
+        if (apiResponseData.hasOwnProperty('Error Message')) {
+            throw new Error(apiResponseData[key]);
+        }
+    }
+ }
+ function apiRequestInterval() {
+    return new Promise(function(resolve, reject) {
+        setTimeout(function() {
+            resolve();
+        }, 20000);
+    });
+ }
+
+/**
+ * QUOTE ENDPOINT: https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=MSFT&apikey=7M2GANU4CTO5UTMU
+ * SEARCH ENDPOINT: https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=&apikey=7M2GANU4CTO5UTMU
+ */
+
+async function searchQuote(quoteName) {
+  try {
+    let quotes = await axios.get('https://www.alphavantage.co/query?', {
+        params: {
+            function: 'SYMBOL_SEARCH',
+            keywords: quoteName,
+            apikey: '7M2GANU4CTO5UTMU'
+        }
+    });
+    throwError(quotes.data);
+    return quotes.data['bestMatches'];
+  } catch (error) {
+      throw error;
+  }  
+}
+
 async function updateQuotes() {
     const assets = await assetSchema.find();
     let assetSymbols = [];
-    for (const asset of assets) {
-        if(assetSymbols.length == 0) {
-            assetSymbols.push(asset.code);
-        } 
-        let hasSymbol = false;
-        for (const assetSymbol of assetSymbols) {
-            if (assetSymbol === asset.code) {
-                hasSymbol = true;
-                break;
-            }
-        }
-        if(!hasSymbol) {
-            assetSymbols.push(asset.code);
-        }
-    }
+    assets.forEach((asset) => {
+        const hasSymbol = assetSymbols.find((assetSymbol) => assetSymbol === asset.code);
+        if(!hasSymbol) assetSymbols.push(asset.code);
+    });
 
-
-    let loop = 0;
     for (const symbol of assetSymbols) {
-        loop++;
-        console.log('[LOOP]', loop);
+        console.log('[SYMBOL]', symbol);
         try {
-            let response = await axios.get('https://www.alphavantage.co/query?', {
+            let quoteValues = await axios.get('https://www.alphavantage.co/query?', {
                 params: {
                     function: 'GLOBAL_QUOTE',
                     symbol: symbol,
                     apikey: '7M2GANU4CTO5UTMU'
                 }
             });
-            await new Promise(function(resolve, reject) {
-                setTimeout(function() {
-                    resolve();
-                }, 20000);
-            });
-            for (const key in response.data) {
-                if (response.data.hasOwnProperty("Error Message")) {
-                    throw new Error(response.data[key]);
-                }
-            }
+            await apiRequestInterval();
+            throwError(quoteValues.data);
 
-            const globalQuote = response.data['Global Quote'];
+            const globalQuote = quoteValues.data['Global Quote'];
 
             let newDoc = {
                 id: mongoose.Schema.Types.ObjectId,
@@ -60,9 +77,8 @@ async function updateQuotes() {
                 previous_close: globalQuote['08. previous close'],
                 change: globalQuote['09. change'],
                 change_percent: globalQuote['10. change percent'],
-            }
-            let quote = new quoteSchema(newDoc);
-            let doc = await quoteSchema.findOneAndUpdate({ symbol: symbol }, 
+            };
+            await quoteSchema.findOneAndUpdate({ symbol: symbol }, 
                 { '$set': newDoc }, {
                 new: true,
                 upsert: true, // Make this update into an upsert
@@ -76,4 +92,4 @@ async function updateQuotes() {
 
 module.exports = {
     updateQuotes
-}
+};
