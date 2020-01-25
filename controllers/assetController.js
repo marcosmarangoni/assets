@@ -15,7 +15,7 @@ async function getAllAssets(request, response) {
         AssetTotal.sum_in = 0;
         AssetTotal.sum_out = 0;
         for (let x = 0; x < Assets.length; ++x) {
-            Assets[x].setInterval();
+            //Assets[x].setInterval();
             Assets[x].sortMovements();
             Assets[x].setGuess();
             // Building AssetTotal
