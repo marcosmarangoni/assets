@@ -36,7 +36,7 @@ mongoose.Promise = global.Promise;
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 mongoose.set('useCreateIndex', true);
-mongoose.set('useFindAndModify',false);
+mongoose.set('useFindAndModify', false);
 
 // Set up handlebars view engine
 app.engine('hbs', hbs({
@@ -69,12 +69,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -98,5 +98,6 @@ app.use(function(err, req, res, next) {
 cron.schedule('*/2 * * * *', () => {
   //alphaVantage.updateQuotes();
 });
+
 
 module.exports = app;
