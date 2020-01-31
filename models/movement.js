@@ -7,8 +7,8 @@ const MovementSchema = new Schema({
   date: {
     type: Date,
     required: [true, 'We need a date for each Movement'],
-    default: new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDate()
-  }, // YYYY-MM-DD
+    default: new Date()
+  }, 
   kind: {
     type: String,
     required: [true, 'The kind of movement must be specified'],

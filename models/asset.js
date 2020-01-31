@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const moment = require('moment');
 const { MovementSchema } = require('./movement.js');
 const { Movement } = require('./movement.js');
 const momentjs = require('moment');
@@ -11,6 +10,10 @@ const AssetSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: [true, 'A valid user is necessary'],
       ref: 'user',
+    },
+    name: {
+      type: String,
+      default: '',      
     },
     code: {
       type: String, required: [true, 'A code is necessary'],
