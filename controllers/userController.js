@@ -1,5 +1,16 @@
 const User = require('../models/user');
 const securityService = require('../services/securityService');
+//const emailTemplate = require('../public/resetPasswordEmail.html');
+const fs = require('fs');
+
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'assetslookup@gmail.com',
+    pass: '4ss3tsl00kup'
+  },
+});
 
 /**
  * Middleware to authenticate the user with JWT
@@ -78,6 +89,28 @@ async function logIn(request, response) {
   }
 }
 
+async function forgotPassword(request, response) {
+  const username = request.body.username;
+  try {
+    const user = await User.findOne({ username });
+    const forgotPasswordToken = securityService.generateSecretKey(20);
+    let emailTemplate = fs.readFileSync(`${__dirname}/../public/resetPasswordEmail.html`).toString();
+    emailTemplate = emailTemplate.replace('{RESET_PASSWORD_LINK}', 'https://localhost:4000/api/reset_password?token=' + forgotPasswordToken);
+    const mailOptions = {
+      from: 'assetslookup@gmail.com',
+      to: username,
+      subject: 'Assets LookUP! Reset Password',
+      html: emailTemplate
+    };
+    let emailResponse =  await transporter.sendMail(mailOptions);
+    console.log('[EMAIL]', emailResponse);
+    await user.updateOne({ forgot_password_token: forgotPasswordToken });
+    response.send({ message: 'EMAIL_SENT' });
+  } catch (error) {
+    response.status(500).send({ error: true, message: error });
+  }
+}
+
 /**
  * GET - /api/users/list
  * Get a list of all available users.
@@ -129,5 +162,6 @@ module.exports = {
   read,
   update,
   remove,
-  authenticate
-}
+  authenticate,
+  forgotPassword
+};
