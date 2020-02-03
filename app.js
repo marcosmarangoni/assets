@@ -95,8 +95,9 @@ app.use(function (err, req, res, next) {
  # │ │ │ │ │ │
  # * * * * * *
  */
-// cron.schedule('*/2 * * * *', () => {
-//   alphaVantage.updateQuotes();
-// });
+cron.schedule('*/2 * * * *', () => {
+  //alphaVantage.updateQuotes();
+});
+
 
 module.exports = app;

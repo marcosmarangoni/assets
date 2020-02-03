@@ -12,6 +12,7 @@ const goalController = require('../controllers/goalController');
 /*********** API User Routes *************/
 router.post('/api/signup', bodyParser.urlencoded({ extended: false }), userController.signUp);
 router.post('/api/login', bodyParser.urlencoded({ extended: false }), userController.logIn);
+router.post('/api/forgot_password', userController.forgotPassword);
 router.get('/api/users/list', userController.authenticate, userController.list);
 router.get('/api/users/read/:id', userController.authenticate, userController.read);
 router.put('/api/users/update/:id', userController.authenticate, userController.update);
