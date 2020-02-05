@@ -118,26 +118,43 @@ async function newMovement(request, response) {
 //Edit Asset
 async function editAsset(request, response) {
 
-    let partialAsset = {
-        code: request.body.code,
-        balance: Number(request.body.balance),
-        unit: Number(request.body.unit),
-        autorefresh: request.body.autorefresh,
-        group: {
-            group_a: request.body.group_a,
-            group_b: request.body.group_b,
-            group_c: request.body.group_c,
-        },
-    };
-    try {
-        let asset = await Asset.findOneAndUpdate({ user_id: request.user.id, _id: request.body.asset }, {
-            $set: partialAsset
-        });
-        response.json(asset);
-
-    } catch (error) {
-        response.status(500).send(error.message);
-    }
+    if(request.body.delete && request.user.username===request.body.deletechecker && request.body._id) {
+        try {
+            await Asset.findByIdAndDelete({user_id: request.user.id, _id: request.body._id});    
+            response.send({"deleted":true});
+        } catch (error) {
+            response.send(error)
+        }
+    } else {
+        let partialAsset = {
+            name: request.body.name,
+            balance: Number(request.body.balance),
+            unit: Number(request.body.unit),
+            autorefresh: request.body.autorefresh
+        };
+    
+        //No requided info
+        if(request.body.autorefresh && request.body.code) {
+            partialAsset.autorefresh = true;
+            partialAsset.code = request.body.code; 
+        } else {
+            partialAsset.autorefresh = false;
+            partialAsset.code = ''; 
+        }    
+        if(request.body.group_a) { partialAsset.group_a = request.body.group_a; }
+        if(request.body.group_b) { partialAsset.group_b = request.body.group_b; }
+        if(request.body.group_c) { partialAsset.group_c = request.body.group_c; }
+        
+        try {
+            await Asset.findOneAndUpdate({ user_id: request.user.id, _id: request.body._id }, {
+                $set: partialAsset
+            });        
+            response.json(partialAsset);
+    
+        } catch (error) {
+            response.status(500).send(error.message);
+        }
+    }   
 }
 
 /************************************************************/
@@ -181,6 +198,25 @@ async function refreshQuotes(req, res) {
     res.send({ message: 'QUOTES_REFRESHED' });
 }
 
+async function getSearchQuotes(req, res) {
+    try {
+        //console.log("QUERY: ",req.query.query);
+        let queryResult = await alphaVatage.searchQuote(req.query.query);
+        //console.log(queryResult);
+        let results = queryResult.map((result) => {
+            let obj = {};
+            obj.code = result['1. symbol'];
+            obj.name = result['2. name'];
+            obj.currency = result['8. currency']
+            return obj;
+        });
+        res.send(results);
+    } catch (error) {
+        res.send(error);
+    }
+    //res.send(JSON.parse('[{"code": "HMC","name": "Honda Motor Co. Ltd.","currency": "USD"},{"code": "HMCTF","name": "Hainan Meilan International Airport Company Limited",         "currency": "USD"        },        {            "code": "HMCNX",            "name": "Harbor Mid Cap Fund Investor Class",            "currency": "USD"        }]'));
+}
+
 module.exports = {
     getAllAssets,
     getAssetById,
@@ -188,5 +224,6 @@ module.exports = {
     newMovement,
     editAsset,
     editMovement,
-    refreshQuotes
+    refreshQuotes,
+    getSearchQuotes
 };
