@@ -1,6 +1,7 @@
 const Asset = require('../models/asset.js');
 const { Movement } = require('../models/movement.js');
 const alphaVatage = require('../services/alphaVantageWorker');
+const momentjs = require('moment');
 const Quotes = require('../models/quote');
 
 
@@ -45,36 +46,48 @@ async function getAssetById(request, response) {
 // Add a new Asset
 async function newAsset(request, response) {
 
-    let value = request.body.value;
-    if (request.body.kind === 'buy') {
-        value *= -1;
-    }
+    let balance = (isNumeric(Number(request.body.balance))?Number(request.body.balance):0);
+    let unit = (isNumeric(Number(request.body.unit))?Number(request.body.unit):0);
+    let total = balance * unit;
 
+    let today = momentjs().startOf('d');
+    today.add(momentjs().utcOffset(), 'm'); // utcOffset is negative to Vancouver, Removing 8 hours.
+    today.utcOffset(0);// Bringing to UTC
+
+    //Default Movement
     let movement = new Movement({
-        date: request.body.date,
-        kind: request.body.kind,
-        value: value,
-        comment: request.body.comment,
+        date: today.toDate(),
+        kind: 'buy',
+        value: -total,
+        comment: '',
     });
 
     let asset = new Asset({
         user_id: request.user.id,
-        code: request.body.code,
-        autorefresh: request.body.autorefresh,
+        name: request.body.name,   
         movements: [movement],
-        balance: Number(request.body.balance),
-        unit: Number(request.body.unit),
-        group: {
-            group_a: request.body.group_a,
-            group_b: request.body.group_b,
-            group_c: request.body.group_c,
-        },
+        balance: balance,
+        unit: unit,
     });
+
+    //No requided info
+    if(request.body.autorefresh && request.body.code) {
+        asset.autorefresh = true;
+        asset.code = request.body.code; 
+    } else {
+        asset.autorefresh = false;
+        asset.code = ''; 
+    }    
+    if(request.body.group_a) { asset.group_a = request.body.group_a; }
+    if(request.body.group_b) { asset.group_b = request.body.group_b; }
+    if(request.body.group_c) { asset.group_c = request.body.group_c; }
+
     try {
         //new var to force tha catch if that is the case
         const saved = await asset.save();
         response.json(saved);
     } catch (err) {
+        console.log(err);
         response.status(500).send(err.message);
     }
 }
@@ -241,6 +254,10 @@ module.exports = {
     getSearchQuotes,
     getQuotes
 };
+
+function isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
 
 
 
