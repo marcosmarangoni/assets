@@ -1,6 +1,7 @@
 const Asset = require('../models/asset.js');
 const { Movement } = require('../models/movement.js');
 const alphaVatage = require('../services/alphaVantageWorker');
+const Quotes = require('../models/quote');
 
 
 /*************************************/
@@ -198,6 +199,7 @@ async function refreshQuotes(req, res) {
     res.send({ message: 'QUOTES_REFRESHED' });
 }
 
+
 async function getSearchQuotes(req, res) {
     try {
         //console.log("QUERY: ",req.query.query);
@@ -217,6 +219,17 @@ async function getSearchQuotes(req, res) {
     //res.send(JSON.parse('[{"code": "HMC","name": "Honda Motor Co. Ltd.","currency": "USD"},{"code": "HMCTF","name": "Hainan Meilan International Airport Company Limited",         "currency": "USD"        },        {            "code": "HMCNX",            "name": "Harbor Mid Cap Fund Investor Class",            "currency": "USD"        }]'));
 }
 
+async function getQuotes(req,res){
+    try {
+        let quotes = await Quotes.find();
+
+        res.send(quotes);
+        
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+}
+
 module.exports = {
     getAllAssets,
     getAssetById,
@@ -225,5 +238,12 @@ module.exports = {
     editAsset,
     editMovement,
     refreshQuotes,
-    getSearchQuotes
+    getSearchQuotes,
+    getQuotes
 };
+
+
+
+
+
+

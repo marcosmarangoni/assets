@@ -12,6 +12,7 @@ const goalController = require('../controllers/goalController');
 /*********** API User Routes *************/
 router.post('/api/signup', bodyParser.urlencoded({ extended: false }), userController.signUp);
 router.post('/api/login', bodyParser.urlencoded({ extended: false }), userController.logIn);
+router.post('/api/forgot_password', userController.forgotPassword);
 router.get('/api/users/list', userController.authenticate, userController.list);
 router.get('/api/users/read/:id', userController.authenticate, userController.read);
 router.put('/api/users/update/:id', userController.authenticate, userController.update);
@@ -37,7 +38,12 @@ router.post('/goals/:goalID', userController.authenticate, goalController.ShowGo
 router.get('/goalsDEBUG/:goalID', userController.authenticate, goalController.ShowGoalData);
 /****************************************/
 
+
+/******** API Quotes Routes *************/
 router.get('/refresh_quotes', assetController.refreshQuotes);
+router.get('/quotes', assetController.getQuotes);
+
+/****************************************/
 
 router.get('/seed', async (req,res) => {
     try {
