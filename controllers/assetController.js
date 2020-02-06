@@ -1,6 +1,7 @@
 const Asset = require('../models/asset.js');
 const { Movement } = require('../models/movement.js');
 const alphaVatage = require('../services/alphaVantageWorker');
+const Quotes = require('../models/quote');
 
 
 /*************************************/
@@ -181,6 +182,18 @@ async function refreshQuotes(req, res) {
     res.send({ message: 'QUOTES_REFRESHED' });
 }
 
+async function getQuotes(req,res){
+    try {
+        let quotes = await Quotes.find();
+
+        res.send(quotes);
+        
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+
+}
+
 module.exports = {
     getAllAssets,
     getAssetById,
@@ -188,5 +201,8 @@ module.exports = {
     newMovement,
     editAsset,
     editMovement,
-    refreshQuotes
+    refreshQuotes,
+    getQuotes
+
 };
+

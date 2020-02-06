@@ -37,7 +37,12 @@ router.post('/goals/:goalID', userController.authenticate, goalController.ShowGo
 router.get('/goalsDEBUG/:goalID', userController.authenticate, goalController.ShowGoalData);
 /****************************************/
 
+
+/******** API Quotes Routes *************/
 router.get('/refresh_quotes', assetController.refreshQuotes);
+router.get('/quotes', assetController.getQuotes);
+
+/****************************************/
 
 router.get('/seed', async (req,res) => {
     try {
