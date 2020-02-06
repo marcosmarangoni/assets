@@ -20,6 +20,7 @@ router.delete('/api/users/remove/:id', userController.authenticate, userControll
 /****************************************/
 
 /******** API Assets Routes *************/
+router.get('/api/assets/queryquote', userController.authenticate ,assetController.getSearchQuotes);
 router.get('/api/assets', userController.authenticate ,assetController.getAllAssets);
 router.get('/api/assets/:asset', userController.authenticate, assetController.getAssetById);
 router.post('/api/assets', userController.authenticate, assetController.newAsset);

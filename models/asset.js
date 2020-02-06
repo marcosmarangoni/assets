@@ -23,11 +23,10 @@ const AssetSchema = new Schema(
     balance: { type: Number, default : 0 },
     unit: { type: Number, default: 0 },
     irr: Number,
-    group: {
-      group_a: { type: String, default: '' },
-      group_b: { type: String, default: '' },
-      group_c: { type: String, default: '' },
-    },
+    group_a: { type: String, default: '' },
+    group_b: { type: String, default: '' },
+    group_c: { type: String, default: '' },
+    
     movements: [{ type: MovementSchema, required: [true, 'A movement is needed'] }],
   }
 );
