@@ -91,5 +91,6 @@ async function updateQuotes() {
 }
 
 module.exports = {
-    updateQuotes
+    updateQuotes,
+    searchQuote
 };

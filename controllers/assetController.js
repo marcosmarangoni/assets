@@ -1,6 +1,7 @@
 const Asset = require('../models/asset.js');
 const { Movement } = require('../models/movement.js');
 const alphaVatage = require('../services/alphaVantageWorker');
+const momentjs = require('moment');
 const Quotes = require('../models/quote');
 
 
@@ -45,36 +46,48 @@ async function getAssetById(request, response) {
 // Add a new Asset
 async function newAsset(request, response) {
 
-    let value = request.body.value;
-    if (request.body.kind === 'buy') {
-        value *= -1;
-    }
+    let balance = (isNumeric(Number(request.body.balance))?Number(request.body.balance):0);
+    let unit = (isNumeric(Number(request.body.unit))?Number(request.body.unit):0);
+    let total = balance * unit;
 
+    let today = momentjs().startOf('d');
+    today.add(momentjs().utcOffset(), 'm'); // utcOffset is negative to Vancouver, Removing 8 hours.
+    today.utcOffset(0);// Bringing to UTC
+
+    //Default Movement
     let movement = new Movement({
-        date: request.body.date,
-        kind: request.body.kind,
-        value: value,
-        comment: request.body.comment,
+        date: today.toDate(),
+        kind: 'buy',
+        value: -total,
+        comment: '',
     });
 
     let asset = new Asset({
         user_id: request.user.id,
-        code: request.body.code,
-        autorefresh: request.body.autorefresh,
+        name: request.body.name,   
         movements: [movement],
-        balance: Number(request.body.balance),
-        unit: Number(request.body.unit),
-        group: {
-            group_a: request.body.group_a,
-            group_b: request.body.group_b,
-            group_c: request.body.group_c,
-        },
+        balance: balance,
+        unit: unit,
     });
+
+    //No requided info
+    if(request.body.autorefresh && request.body.code) {
+        asset.autorefresh = true;
+        asset.code = request.body.code; 
+    } else {
+        asset.autorefresh = false;
+        asset.code = ''; 
+    }    
+    if(request.body.group_a) { asset.group_a = request.body.group_a; }
+    if(request.body.group_b) { asset.group_b = request.body.group_b; }
+    if(request.body.group_c) { asset.group_c = request.body.group_c; }
+
     try {
         //new var to force tha catch if that is the case
         const saved = await asset.save();
         response.json(saved);
     } catch (err) {
+        console.log(err);
         response.status(500).send(err.message);
     }
 }
@@ -119,26 +132,43 @@ async function newMovement(request, response) {
 //Edit Asset
 async function editAsset(request, response) {
 
-    let partialAsset = {
-        code: request.body.code,
-        balance: Number(request.body.balance),
-        unit: Number(request.body.unit),
-        autorefresh: request.body.autorefresh,
-        group: {
-            group_a: request.body.group_a,
-            group_b: request.body.group_b,
-            group_c: request.body.group_c,
-        },
-    };
-    try {
-        let asset = await Asset.findOneAndUpdate({ user_id: request.user.id, _id: request.body.asset }, {
-            $set: partialAsset
-        });
-        response.json(asset);
-
-    } catch (error) {
-        response.status(500).send(error.message);
-    }
+    if(request.body.delete && request.user.username===request.body.deletechecker && request.body._id) {
+        try {
+            await Asset.findByIdAndDelete({user_id: request.user.id, _id: request.body._id});    
+            response.send({"deleted":true});
+        } catch (error) {
+            response.send(error)
+        }
+    } else {
+        let partialAsset = {
+            name: request.body.name,
+            balance: Number(request.body.balance),
+            unit: Number(request.body.unit),
+            autorefresh: request.body.autorefresh
+        };
+    
+        //No requided info
+        if(request.body.autorefresh && request.body.code) {
+            partialAsset.autorefresh = true;
+            partialAsset.code = request.body.code; 
+        } else {
+            partialAsset.autorefresh = false;
+            partialAsset.code = ''; 
+        }    
+        if(request.body.group_a) { partialAsset.group_a = request.body.group_a; }
+        if(request.body.group_b) { partialAsset.group_b = request.body.group_b; }
+        if(request.body.group_c) { partialAsset.group_c = request.body.group_c; }
+        
+        try {
+            await Asset.findOneAndUpdate({ user_id: request.user.id, _id: request.body._id }, {
+                $set: partialAsset
+            });        
+            response.json(partialAsset);
+    
+        } catch (error) {
+            response.status(500).send(error.message);
+        }
+    }   
 }
 
 /************************************************************/
@@ -182,6 +212,26 @@ async function refreshQuotes(req, res) {
     res.send({ message: 'QUOTES_REFRESHED' });
 }
 
+
+async function getSearchQuotes(req, res) {
+    try {
+        //console.log("QUERY: ",req.query.query);
+        let queryResult = await alphaVatage.searchQuote(req.query.query);
+        //console.log(queryResult);
+        let results = queryResult.map((result) => {
+            let obj = {};
+            obj.code = result['1. symbol'];
+            obj.name = result['2. name'];
+            obj.currency = result['8. currency']
+            return obj;
+        });
+        res.send(results);
+    } catch (error) {
+        res.send(error);
+    }
+    //res.send(JSON.parse('[{"code": "HMC","name": "Honda Motor Co. Ltd.","currency": "USD"},{"code": "HMCTF","name": "Hainan Meilan International Airport Company Limited",         "currency": "USD"        },        {            "code": "HMCNX",            "name": "Harbor Mid Cap Fund Investor Class",            "currency": "USD"        }]'));
+}
+
 async function getQuotes(req,res){
     try {
         let quotes = await Quotes.find();
@@ -191,7 +241,6 @@ async function getQuotes(req,res){
     } catch (error) {
         res.status(500).send(error.message);
     }
-
 }
 
 module.exports = {
@@ -202,7 +251,16 @@ module.exports = {
     editAsset,
     editMovement,
     refreshQuotes,
+    getSearchQuotes,
     getQuotes
-
 };
+
+function isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
+
+
+
+
+
 
