@@ -99,11 +99,11 @@ async function newMovement(request, response) {
     let value = Number(request.body.value);
     switch (request.body.kind) {
         case "sell": //Decrement
-            increment = -(Number(request.body.balance));
+            increment = -(Number(request.body.quantity));
             break;
         case "buy": // Increment
-            increment = (Number(request.body.balance));
-            value = -value;
+            increment = (Number(request.body.quantity));
+            value = -Math.abs(value);
             break;
         default:
             break;
@@ -178,19 +178,17 @@ async function editMovement(request, response) {
     const tradeid = request.body.tradeid;
 
     if (request.body.remove !== undefined && request.body.remove) {
-
+        //TODO DELETE!
         //await Ativo.findOneAndUpdate({ _id: id }, { $pull: { trades: { trade_id: mongoose.Types.ObjectId(tradeid) } } });
 
     } else {
-        console.log(request.body.date);
+        //console.log(request.body.date);
         const partialMovement = {
             date: new Date(request.body.date),
             kind: request.body.kind,
             value: Number(request.body.value),
             comment: request.body.comment,
         };
-
-        //TODO DELETE!
 
         try {
 
