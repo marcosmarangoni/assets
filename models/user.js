@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
     {
-      email: {
+      username: {
         type: String,
         required: [true, 'An username is required'],
         unique: true,
@@ -44,8 +44,8 @@ const UserSchema = new Schema(
         },
         max: [30, 'Sorry you reached the maximum number of characters'],
       },
-      random_token: {
-          type: String,
+      forgot_password_token: {
+        type: String,
       },
       stats: {
           type: Object,
