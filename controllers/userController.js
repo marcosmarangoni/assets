@@ -134,7 +134,13 @@ async function list(request, response) {
  * @param {*} response 
  */
 async function read(request, response) {
-  response.send('NOT IMPLEMENTED: READ_USER');
+  try {
+    response.json(request.user);
+  } catch (error) {
+    response.status(500).send({ error: true, message: error });
+  }
+
+  //response.send('NOT IMPLEMENTED: READ_USER');
 }
 
 /**
@@ -143,7 +149,36 @@ async function read(request, response) {
  * @param {*} response 
  */
 async function update(request, response) {
-  response.send('NOT IMPLEMENTED: UPDATE_USER');
+  console.log('Request NODE - ANDRe', request);
+
+  let newInfo = {
+      username: request.body.username,
+      first_name:request.body.first_name,
+      last_name: request.body.last_name,
+      password: request.body.password //User current password
+    };
+
+  try {
+    if(request.body.new_password1 === request.body.new_password2 && (request.body.new_password1).trim() !== '' ){
+      newInfo.password = securityService.encrypt(request.body.new_password1); //encrypt new password
+    }
+
+    else if(request.body.new_password1 !== request.body.new_password2 && (request.body.new_password1).trim() !== '' ){
+      throw new Error('Passwords does not match!');
+    }
+
+    else if(securityService.encrypt(request.body.new_password1) === securityService.encrypt(request.body.new_password2 && (request.body.new_password1).trim() !== '')
+
+    await User.findOneAndUpdate({ _id: request.user.id }, {
+        $set: newInfo
+    });        
+    response.json(newInfo);
+
+} catch (error) {
+    response.status(500).send(error.message);
+}
+
+
 }
 
 /**
