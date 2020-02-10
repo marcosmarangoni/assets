@@ -44,12 +44,16 @@ async function searchQuote(quoteName) {
 
 async function updateQuotes() {
     const assets = await assetSchema.find();
-    let assetSymbols = [];
-    assets.forEach((asset) => {
-        const hasSymbol = assetSymbols.find((assetSymbol) => assetSymbol === asset.code);
-        if(!hasSymbol) assetSymbols.push(asset.code);
+    let assetsToGetQuotes = assets.filter(asset => {
+        return (asset.code !== undefined && asset.code !== "" && asset.autorefresh===true);
     });
-
+    let assetSymbols = [];
+    assetsToGetQuotes.forEach((asset,i) => {
+        if(assetSymbols.indexOf(asset.code)===-1) {
+            assetSymbols.push(asset.code);
+        }
+    });
+    
     for (const symbol of assetSymbols) {
         console.log('[SYMBOL]', symbol);
         try {
@@ -60,8 +64,8 @@ async function updateQuotes() {
                     apikey: '7M2GANU4CTO5UTMU'
                 }
             });
-            await apiRequestInterval();
             throwError(quoteValues.data);
+
 
             const globalQuote = quoteValues.data['Global Quote'];
 
@@ -78,14 +82,21 @@ async function updateQuotes() {
                 change: globalQuote['09. change'],
                 change_percent: globalQuote['10. change percent'],
             };
+            console.log(newDoc);
             await quoteSchema.findOneAndUpdate({ symbol: symbol }, 
                 { '$set': newDoc }, {
                 new: true,
                 upsert: true, // Make this update into an upsert
                 useFindAndModify: false
             });
+            let obj = await assetSchema.updateMany({code: symbol, autorefresh:true},
+                {unit: Number.parseFloat(newDoc.price)});
+            console.log("RETURN", obj);
         } catch (error) {
             console.log('[ERROR]', error.message);
+        }
+        finally{
+            await apiRequestInterval();
         }
     }
 }
