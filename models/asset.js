@@ -13,20 +13,20 @@ const AssetSchema = new Schema(
     },
     name: {
       type: String,
-      default: '',      
+      default: '',
     },
     code: {
       type: String, required: [true, 'A code is necessary'],
       max: [20, 'Sorry you reached the maximum number of characters']
     },
     autorefresh: { type: Boolean, default: false },
-    balance: { type: Number, default : 0 },
+    balance: { type: Number, default: 0 },
     unit: { type: Number, default: 0 },
     irr: Number,
     group_a: { type: String, default: '' },
     group_b: { type: String, default: '' },
     group_c: { type: String, default: '' },
-    
+
     movements: [{ type: MovementSchema, required: [true, 'A movement is needed'] }],
   }
 );
@@ -43,13 +43,13 @@ AssetSchema.methods.setGuess = function () {
   this.sum_out = 0;
 
   for (let x = 0; x < this.movements.length; ++x) {
-    if (this.movements[x].value > 0) { 
-      this.sum_in += this.movements[x].value; 
-    } else { 
-      this.sum_out += this.movements[x].value; 
+    if (this.movements[x].value > 0) {
+      this.sum_in += this.movements[x].value;
+    } else {
+      this.sum_out += this.movements[x].value;
     }
   }
-  
+
   let today = momentjs().startOf('d');
   today.add(momentjs().utcOffset(), 'm'); // utcOffset is negative to Vancouver, Removing 8 hours.
   today.utcOffset(0);// Bringing to UTC
@@ -58,26 +58,24 @@ AssetSchema.methods.setGuess = function () {
     date: today.toDate(),
     kind: 'holdings',
     value: this.total
-  });  
+  });
   this.movements.push(totalMovement);
   this.sum_in += this.total;
   //End of Preparation
 
-  //Calculo apenas com um minimo de 29 dias. (29/365) = ~ 0.08
+  //Calculus just with a minimum of 29 days. (29/365) = ~ 0.08
   const min_interval = 0.08;
-  let retorno = (this.sum_in / -this.sum_out);
-  //console.log(retorno);
+  let invReturn = (this.sum_in / -this.sum_out);
 
-  if (this.movements[0].interval < min_interval || this.movements.length === 2) { // Intervalo pequeno ou apenas 2 movimentos
-    if (isNaN(retorno) || retorno <= 0.01) { // sem saida ou sem entrada / prejuizo muito grande.
-      console.log('Retorno da Merda - ' + this.code);
+  if (this.movements[0].interval < min_interval || this.movements.length === 2) { //Small Interval or just 2 moviments
+    if (isNaN(invReturn) || invReturn <= 0.01) { // No input neither output / big loss
       this.irr = -0.99;
-    } else { // Calculo Simples
-      console.log('Ret Simples Oper: ' + this.movements.length + ' Taxa:' + (Math.pow(retorno, (1 / Math.max(min_interval, this.movements[0].interval))) - 1) + ' ' + this.codigo);
-      this.irr = (Math.pow(retorno, (1 / Math.max(min_interval, this.movements[0].interval))) - 1);
+    } else { // Simple Calculus
+      console.log('Ret Simple Oper: ' + this.movements.length + ' Interest Rate:' + (Math.pow(invReturn, (1 / Math.max(min_interval, this.movements[0].interval))) - 1) + ' ' + this.name);
+      this.irr = (Math.pow(invReturn, (1 / Math.max(min_interval, this.movements[0].interval))) - 1);
     }
   } else {
-    if (isNaN(this.irr)) { this.irr = retorno; }
+    if (isNaN(this.irr)) { this.irr = invReturn; }
     this.setIRR();
   }
 };
@@ -91,8 +89,8 @@ AssetSchema.methods.setIRR = function () {
   let guess_third = 0;
 
   do {
-    // Seguranca do Guess
-    if ((this.irr > 2 && i === 0) || (this.irr < -0.5 && i === 0) || isNaN(this.irr)) { // Maior que 200% ou menor que -50%
+    // Guess Security
+    if ((this.irr > 2 && i === 0) || (this.irr < -0.5 && i === 0) || isNaN(this.irr)) { // Bigger than 200% or less than -50%
       this.irr = 0.1 * i;
     }
     ++i;
@@ -115,7 +113,7 @@ AssetSchema.methods.setIRR = function () {
 
     if (i >= 6) {
       if (Math.abs(vp_all) > Math.abs(vp_second) || Math.abs(vp_second) > Math.abs(vp_third)) {
-        // Nao estou aproximando do Zero, provavelmente o IRR e impossivel
+        //Cannot get any NPV equal to 0, probably IRR is imposible.
         i = 100;
         this.irr = 0;
         break;
