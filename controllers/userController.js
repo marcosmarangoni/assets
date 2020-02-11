@@ -159,15 +159,20 @@ async function update(request, response) {
     };
 
   try {
-    if(request.body.new_password1 === request.body.new_password2 && (request.body.new_password1).trim() !== '' ){
+    if(request.body.new_password1 === request.body.new_password2 &&
+      (request.body.new_password1).trim() !== '' ) {
       newInfo.password = securityService.encrypt(request.body.new_password1); //encrypt new password
     }
 
-    else if(request.body.new_password1 !== request.body.new_password2 && (request.body.new_password1).trim() !== '' ){
+    else if(request.body.new_password1 !== request.body.new_password2 &&
+      (request.body.new_password1).trim() !== '' ) {
       throw new Error('Passwords does not match!');
     }
 
-    else if(securityService.encrypt(request.body.new_password1) === securityService.encrypt(request.body.new_password2 && (request.body.new_password1).trim() !== '')
+    else if(securityService.encrypt(request.body.new_password1) === securityService.encrypt(request.body.new_password2
+      && (request.body.new_password1).trim() !== '')) {
+
+    }
 
     await User.findOneAndUpdate({ _id: request.user.id }, {
         $set: newInfo
