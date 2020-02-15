@@ -24,6 +24,7 @@ async function getAllAssets(request, response) {
             Assets[x].movements.forEach(movement => {
                 AssetTotal.movements.push(movement);
             });
+            AssetTotal.movements.pop();
             AssetTotal.unit += Assets[x].total;
             AssetTotal.sum_in += Assets[x].sum_in;
             AssetTotal.sum_out += Assets[x].sum_out;
