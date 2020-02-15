@@ -167,7 +167,7 @@ async function update(request, response) {
       throw new Error('Passwords does not match!');
     }
 
-    else if(securityService.encrypt(request.body.new_password1) === securityService.encrypt(request.body.new_password2 && (request.body.new_password1).trim() !== '')
+   //else if(securityService.encrypt(request.body.new_password1) === securityService.encrypt(request.body.new_password2 && (request.body.new_password1).trim() !== ''){}
 
     await User.findOneAndUpdate({ _id: request.user.id }, {
         $set: newInfo
