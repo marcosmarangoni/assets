@@ -48,7 +48,7 @@ const QuoteSchema = new Schema({
         type: Number,
         },
     change_percent: {
-        type: String,
+        type: Number,
         },
 });
 
