@@ -39,7 +39,7 @@ const QuoteSchema = new Schema({
         type: Number,
         },
     lastest_trading_day: {
-        type: String,
+        type: Date,
         },
     previous_close: {
         type: Number,
