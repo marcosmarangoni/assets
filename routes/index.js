@@ -45,37 +45,4 @@ router.get('/quotes', assetController.getQuotes);
 
 /****************************************/
 
-router.get('/seed', async (req,res) => {
-    try {
-        let andre = new User();
-        andre.first_name = 'Andre';
-        andre.last_name = 'Sa';
-        andre.username = 'andre3@s.com';
-        andre.password = 'teste1234';
-        await andre.save();
-    
-        let movs = [{
-            date:'2017-01-01',
-            mov_id: mongoose.Types.ObjectId(),
-            kind:'c',
-            value:-15000 },
-            {
-            date:'2017-01-01',
-            mov_id: mongoose.Types.ObjectId(),
-            kind:'d',
-            value: 15 }];
-
-        let wmt = new Asset();
-        wmt.code = 'WMT';
-        wmt.user_id = andre.id;
-        wmt.movements = movs;
-        await wmt.save();
-        res.send(wmt);    
-    } catch (error) {
-        console.log(error);
-        res.status(500).send(error.message);
-    }
-    
-});
-
 module.exports = router;
