@@ -231,7 +231,6 @@ async function getSearchQuotes(req, res) {
     } catch (error) {
         res.send(error);
     }
-    //res.send(JSON.parse('[{"code": "HMC","name": "Honda Motor Co. Ltd.","currency": "USD"},{"code": "HMCTF","name": "Hainan Meilan International Airport Company Limited",         "currency": "USD"        },        {            "code": "HMCNX",            "name": "Harbor Mid Cap Fund Investor Class",            "currency": "USD"        }]'));
 }
 
 async function getQuotes(req,res){
