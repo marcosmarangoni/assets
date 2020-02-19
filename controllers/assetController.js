@@ -3,6 +3,7 @@ const { Movement } = require('../models/movement.js');
 const alphaVatage = require('../services/alphaVantageWorker');
 const momentjs = require('moment');
 const Quotes = require('../models/quote');
+const User = require('./../models/user.js');
 
 
 /*************************************/
@@ -33,6 +34,8 @@ async function getAllAssets(request, response) {
         //Excluding movements before send.
         AssetTotal.movements = [];
     }
+    const newStats = {asset_amt: AssetTotal.total, return:AssetTotal.irr};
+    await User.findOneAndUpdate({ _id: request.user.id }, {stats : newStats});
     response.json({ assets: Assets, asset_total: AssetTotal });
 }
 
@@ -228,7 +231,6 @@ async function getSearchQuotes(req, res) {
     } catch (error) {
         res.send(error);
     }
-    //res.send(JSON.parse('[{"code": "HMC","name": "Honda Motor Co. Ltd.","currency": "USD"},{"code": "HMCTF","name": "Hainan Meilan International Airport Company Limited",         "currency": "USD"        },        {            "code": "HMCNX",            "name": "Harbor Mid Cap Fund Investor Class",            "currency": "USD"        }]'));
 }
 
 async function getQuotes(req,res){

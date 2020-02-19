@@ -3,23 +3,40 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 const GoalSchema = new Schema(
-    {
+  {
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       required: [true, 'Um User e necessario'],
-      ref: 'user',
+      ref: 'user'
     },
-    fluxos:[{
-        type: Object,
-            fluxo_id: { type: mongoose.Schema.Types.ObjectId, required: [true, 'Um codigo e necessario'] },
-            nome: { type: String},
-            comportamento: { type: String},
-            datestart: { type: String},
-            dateend: { type: String},
-            valorinicial: { type: Number},
-            patvalue: { type: Boolean, default:false },
-            cresrate: { type: Number},
-            patrate: { type: Boolean, default:false }
+    name: {
+      type: String,
+      default: ''
+    },
+    insertAssets: {
+      type: Boolean,
+      default: true
+    },
+    returnWithIrr: {
+      type: Boolean,
+      default: true
+    },
+    useAssetIrrOnResult: {
+      type: Boolean,
+      default: true
+    },
+    irrOnResult: {
+      type: Number,
+      default: 0
+    },
+    boxes: [{
+      description: { type: String, default: '' },
+      periodicity: { type: String, default: '' },
+      value: { type: Number, default: 0 },
+      dateStart: { type: String, default: (new Date()).toISOString() },
+      dateEnd: { type: String, default: (new Date()).toISOString() },
+      interestRate: { type: Number, default: 1 },
+      useIRR: { type: Boolean, default: false },
     }]
   }
 );
