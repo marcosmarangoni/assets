@@ -178,13 +178,11 @@ async function editAsset(request, response) {
 /************************************************************/
 // Edit Movement
 async function editMovement(request, response) {
-    const id = request.body.id;
-    const tradeid = request.body.tradeid;
 
-    if (request.body.remove !== undefined && request.body.remove) {
-        //TODO DELETE!
-        //await Ativo.findOneAndUpdate({ _id: id }, { $pull: { trades: { trade_id: mongoose.Types.ObjectId(tradeid) } } });
-
+    if (request.body.delete !== undefined && request.body.delete) {
+        const movement = await Asset.findOneAndUpdate({ user_id: request.user.id, _id: request.body.asset },
+             { $pull: { movements: { _id: request.body.movement } } });
+             response.json(movement);
     } else {
         //console.log(request.body.date);
         const partialMovement = {
