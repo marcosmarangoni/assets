@@ -21,24 +21,21 @@ router.delete('/api/users/remove/:id', userController.authenticate, userControll
 /****************************************/
 
 /******** API Assets Routes *************/
-router.get('/api/assets/queryquote', userController.authenticate ,assetController.getSearchQuotes);
-router.get('/api/assets', userController.authenticate ,assetController.getAllAssets);
-router.get('/api/assets/:asset', userController.authenticate, assetController.getAssetById);
+router.get( '/api/assets/queryquote', userController.authenticate ,assetController.getSearchQuotes);
+router.get( '/api/assets', userController.authenticate ,assetController.getAllAssets);
+router.get( '/api/assets/:asset', userController.authenticate, assetController.getAssetById);
 router.post('/api/assets', userController.authenticate, assetController.newAsset);
 router.post('/api/assets/movement', userController.authenticate, assetController.newMovement);
-router.put('/api/assets', userController.authenticate, assetController.editAsset);
-router.put('/api/assets/movement', userController.authenticate, assetController.editMovement);
+router.put( '/api/assets', userController.authenticate, assetController.editAsset);
+router.put( '/api/assets/movement', userController.authenticate, assetController.editMovement);
 /****************************************/
 
 /******** API Goals Routes *************/
-router.get( '/goals/', userController.authenticate, goalController.index);
-router.post('/goals/', userController.authenticate, goalController.indexList);
-router.post('/goals/create', userController.authenticate, goalController.createGoal);
-router.get( '/goals/:goalID', userController.authenticate, goalController.ShowGoal);
-router.post('/goals/:goalID', userController.authenticate, goalController.ShowGoalData);
-router.get('/goalsDEBUG/:goalID', userController.authenticate, goalController.ShowGoalData);
+router.get( '/api/goals', userController.authenticate, goalController.getAllGoals);
+router.post('/api/goals', userController.authenticate, goalController.createGoal);
+router.get( '/api/goals/:goal', userController.authenticate, goalController.getGoal);
+router.put( '/api/goals/:goal', userController.authenticate, goalController.updateGoal);
 /****************************************/
-
 
 /******** API Quotes Routes *************/
 router.get('/refresh_quotes', assetController.refreshQuotes);
