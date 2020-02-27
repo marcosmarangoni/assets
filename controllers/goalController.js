@@ -13,12 +13,10 @@ async function getGoal(req, res) {
 }
 
 async function createGoal(req, res) {
-    //console.log("Body",req.body);
-    let goal = new Goal({...req.body});
+    let goal = new Goal({ ...req.body });
     goal.user_id = req.user.id;
-    console.log("Object",goal);
     try {
-        await goal.save();    
+        await goal.save();
     } catch (error) {
         console.log(error)
     }
@@ -26,15 +24,19 @@ async function createGoal(req, res) {
 }
 
 async function updateGoal(req, res) {
-    
+    let goal = new Goal({ ...req.body });
+    goal.user_id = req.user.id;
+    await Goal.findOneAndUpdate({ user_id: req.user.id, _id: goal._id }, { $set: goal });
+    res.send(goal)
+
 }
 
 
 module.exports = {
-    
+
     getAllGoals, // Get
     getGoal, // Get
     createGoal, // Post
-    updateGoal, // Post
-    
+    updateGoal, // Put
+
 };

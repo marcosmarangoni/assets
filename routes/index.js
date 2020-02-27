@@ -32,8 +32,8 @@ router.put( '/api/assets/movement', userController.authenticate, assetController
 /******** API Goals Routes *************/
 router.get( '/api/goals', userController.authenticate, goalController.getAllGoals);
 router.post('/api/goals', userController.authenticate, goalController.createGoal);
+router.put( '/api/goals', userController.authenticate, goalController.updateGoal);
 router.get( '/api/goals/:goal', userController.authenticate, goalController.getGoal);
-router.put( '/api/goals/:goal', userController.authenticate, goalController.updateGoal);
 /****************************************/
 
 /******** API Quotes Routes *************/
