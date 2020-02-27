@@ -103,7 +103,7 @@ async function forgotPassword(request, response) {
     if(device.os.name === 'Android') {
       emailPasswordLink = `http://www.assetslookup.com/forgot_password?token=${forgotPasswordToken}&username=${username}`;
     } else {
-      emailPasswordLink = `http://localhost:4000/api/reset_password?token=${forgotPasswordToken}&username=${username}`;
+      emailPasswordLink = `http://localhost:3000/reset_password?token=${forgotPasswordToken}&username=${username}`;
     }
 
     emailTemplate = emailTemplate.replace('{RESET_PASSWORD_LINK}', emailPasswordLink);
