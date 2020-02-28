@@ -13,6 +13,7 @@ const goalController = require('../controllers/goalController');
 router.post('/api/signup', bodyParser.urlencoded({ extended: false }), userController.signUp);
 router.post('/api/login', bodyParser.urlencoded({ extended: false }), userController.logIn);
 router.post('/api/forgot_password', userController.forgotPassword);
+router.post('/api/reset_password', bodyParser.urlencoded({ extended: false }), userController.resetPassword);
 router.get('/api/users/list', userController.authenticate, userController.list);
 router.get('/api/users/read/:id', userController.authenticate, userController.read);
 router.put('/api/users/update/:id', userController.authenticate, userController.update);
