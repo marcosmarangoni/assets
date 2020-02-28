@@ -26,7 +26,7 @@ async function authenticate(req, res, next) {
     }
     const token = req.headers.authorization;
     const decodedJWT = securityService.decodeJWT(token);
-    console.log(decodedJWT);
+    //console.log(decodedJWT);
     const user = await User.findOne({ username: decodedJWT.username });
     req.user = user;
     next();
