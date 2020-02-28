@@ -132,47 +132,46 @@ async function newMovement(request, response) {
     }
 }
 
+async function deleteAsset(request, response) {
+    try {
+        await Asset.findByIdAndDelete({user_id: request.user.id, _id: request.body._id});    
+        response.send({"deleted":true});
+    } catch (error) {
+        response.status(500).send({ message: error.message });
+    }
+}
+
 /************************************************************/
 //Edit Asset
 async function editAsset(request, response) {
+    let partialAsset = {
+        name: request.body.name,
+        balance: Number(request.body.balance),
+        unit: Number(request.body.unit),
+        autorefresh: request.body.autorefresh
+    };
 
-    if(request.body.delete && request.user.username===request.body.deletechecker && request.body._id) {
-        try {
-            await Asset.findByIdAndDelete({user_id: request.user.id, _id: request.body._id});    
-            response.send({"deleted":true});
-        } catch (error) {
-            response.send(error)
-        }
+    //No requided info
+    if(request.body.autorefresh && request.body.code) {
+        partialAsset.autorefresh = true;
+        partialAsset.code = request.body.code; 
     } else {
-        let partialAsset = {
-            name: request.body.name,
-            balance: Number(request.body.balance),
-            unit: Number(request.body.unit),
-            autorefresh: request.body.autorefresh
-        };
+        partialAsset.autorefresh = false;
+        partialAsset.code = ''; 
+    }    
+    if(request.body.group_a) { partialAsset.group_a = request.body.group_a; }
+    if(request.body.group_b) { partialAsset.group_b = request.body.group_b; }
+    if(request.body.group_c) { partialAsset.group_c = request.body.group_c; }
     
-        //No requided info
-        if(request.body.autorefresh && request.body.code) {
-            partialAsset.autorefresh = true;
-            partialAsset.code = request.body.code; 
-        } else {
-            partialAsset.autorefresh = false;
-            partialAsset.code = ''; 
-        }    
-        if(request.body.group_a) { partialAsset.group_a = request.body.group_a; }
-        if(request.body.group_b) { partialAsset.group_b = request.body.group_b; }
-        if(request.body.group_c) { partialAsset.group_c = request.body.group_c; }
-        
-        try {
-            await Asset.findOneAndUpdate({ user_id: request.user.id, _id: request.body._id }, {
-                $set: partialAsset
-            });        
-            response.json(partialAsset);
-    
-        } catch (error) {
-            response.status(500).send(error.message);
-        }
-    }   
+    try {
+        await Asset.findOneAndUpdate({ user_id: request.user.id, _id: request.body._id }, {
+            $set: partialAsset
+        });        
+        response.json(partialAsset);
+
+    } catch (error) {
+        response.status(500).send(error.message);
+    }
 }
 
 /************************************************************/
@@ -248,6 +247,7 @@ module.exports = {
     newAsset,
     newMovement,
     editAsset,
+    deleteAsset,
     editMovement,
     refreshQuotes,
     getSearchQuotes,

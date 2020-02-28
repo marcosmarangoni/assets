@@ -26,6 +26,7 @@ router.get( '/api/assets/:asset', userController.authenticate, assetController.g
 router.post('/api/assets', userController.authenticate, assetController.newAsset);
 router.post('/api/assets/movement', userController.authenticate, assetController.newMovement);
 router.put( '/api/assets', userController.authenticate, assetController.editAsset);
+router.delete('/api/assets', userController.authenticate, assetController.deleteAsset);
 router.put( '/api/assets/movement', userController.authenticate, assetController.editMovement);
 /****************************************/
 
