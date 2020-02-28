@@ -16,19 +16,33 @@ async function createGoal(req, res) {
     let goal = new Goal({ ...req.body });
     goal.user_id = req.user.id;
     try {
-        await goal.save();
+        let goal2 = await goal.save();
+        console.log("After",goal2);
     } catch (error) {
         console.log(error)
     }
     res.json(goal);
 }
 
-async function updateGoal(req, res) {
-    let goal = new Goal({ ...req.body });
-    goal.user_id = req.user.id;
-    await Goal.findOneAndUpdate({ user_id: req.user.id, _id: goal._id }, { $set: goal });
-    res.send(goal)
+async function deleteGoal(req, res) {
+    try {
+        await Goal.findOneAndDelete({ user_id: req.user.id, _id: req.body._id });
+        res.send({delete:true});
+    } catch (error) {
+        res.send(error);
+    }
+}
 
+async function updateGoal(req, res) {
+    try {
+        let goal = new Goal({ ...req.body });
+        goal.user_id = req.user.id;
+        await Goal.findOneAndUpdate({ user_id: req.user.id, _id: goal._id }, { $set: goal });
+        res.send(goal);  
+    } catch (error) {
+        res.send(error);
+    }
+    
 }
 
 
@@ -38,5 +52,6 @@ module.exports = {
     getGoal, // Get
     createGoal, // Post
     updateGoal, // Put
+    deleteGoal // Delete
 
 };
