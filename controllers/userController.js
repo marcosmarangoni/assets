@@ -1,6 +1,6 @@
 const User = require('../models/user');
 const securityService = require('../services/securityService');
-//const emailTemplate = require('../public/resetPasswordEmail.html');
+const DeviceDetector = require('device-detector-js');
 const fs = require('fs');
 
 const nodemailer = require('nodemailer');
@@ -92,10 +92,21 @@ async function logIn(request, response) {
 async function forgotPassword(request, response) {
   const username = request.body.username;
   try {
+    const deviceDetector = new DeviceDetector();
+    const device = deviceDetector.parse(request.headers['user-agent']);
     const user = await User.findOne({ username });
     const forgotPasswordToken = securityService.generateSecretKey(20);
     let emailTemplate = fs.readFileSync(`${__dirname}/../public/resetPasswordEmail.html`).toString();
-    emailTemplate = emailTemplate.replace('{RESET_PASSWORD_LINK}', 'https://localhost:4000/api/reset_password?token=' + forgotPasswordToken);
+
+    // Enable deep link
+    let emailPasswordLink = '';
+    if(device.os.name === 'Android') {
+      emailPasswordLink = `http://www.assetslookup.com/forgot_password?token=${forgotPasswordToken}&username=${username}`;
+    } else {
+      emailPasswordLink = `http://localhost:3000/reset_password?token=${forgotPasswordToken}&username=${username}`;
+    }
+
+    emailTemplate = emailTemplate.replace('{RESET_PASSWORD_LINK}', emailPasswordLink);
     const mailOptions = {
       from: 'assetslookup@gmail.com',
       to: username,
@@ -108,6 +119,30 @@ async function forgotPassword(request, response) {
     response.send({ message: 'EMAIL_SENT' });
   } catch (error) {
     response.status(500).send({ error: true, message: error });
+  }
+}
+
+/**
+ * 
+ * @param {Request} request 
+ * @param {Response} response 
+ */
+async function resetPassword(request, response) {
+  const username = request.body.username;
+  const newPassword = request.body.password;
+  const token = request.body.forgot_password_token;
+  try {
+    const user = await User.findOne({ username });
+    if(user.forgot_password_token === token) {
+      user.password = newPassword;
+      user.forgot_password_token = "";
+      await user.save();
+      response.send({ message: "OK" });
+    } else {
+      response.status(401).send({ message: "Invalid token for your email" });
+    }
+  } catch (error) {
+    response.status(500).send({ message: error.message });
   }
 }
 
@@ -207,5 +242,6 @@ module.exports = {
   update,
   remove,
   authenticate,
-  forgotPassword
+  forgotPassword,
+  resetPassword
 };
