@@ -16,8 +16,7 @@ const AssetSchema = new Schema(
       default: '',
     },
     code: {
-      type: String, required: [true, 'A code is necessary'],
-      max: [20, 'Sorry you reached the maximum number of characters']
+      type: String
     },
     autorefresh: { type: Boolean, default: false },
     balance: { type: Number, default: 0 },
