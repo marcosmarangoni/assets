@@ -1,8 +1,0 @@
-{
-    "recommendations": [
-        "ionutvmi.path-autocomplete",
-        "mrmlnc.vscode-scss",
-        "zignd.html-css-class-completion",
-        "dbaeumer.vscode-eslint"
-    ]
-}

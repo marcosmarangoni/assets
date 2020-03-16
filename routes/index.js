@@ -1,53 +1,48 @@
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
+const User = require('../models/user');
+const Asset = require('../models/asset');
+const mongoose = require('mongoose');
 
 const userController = require('../controllers/userController');
-const apiUserController = require('../controllers/apiUserController');
-
-const ativoController = require('../controllers/ativoController');
-
-/*********** User Routes *************/
-//router.get('/', userController.signUp);
-//router.get('/signUp', userController.signUp);
-/****************************************/
+const assetController = require('../controllers/assetController');
+const goalController = require('../controllers/goalController');
 
 /*********** API User Routes *************/
-router.post('/api/signup', bodyParser.urlencoded({ extended: false }), apiUserController.signUp);
-router.post('/api/login', bodyParser.urlencoded({ extended: false }), apiUserController.logIn);
-router.get('/api/users/list', apiUserController.list);
-router.get('/api/users/read/:id', apiUserController.read);
-router.put('/api/users/update/:id', apiUserController.update);
-router.delete('/api/users/remove/:id', apiUserController.remove);
+router.post('/api/signup', bodyParser.urlencoded({ extended: false }), userController.signUp);
+router.post('/api/login', bodyParser.urlencoded({ extended: false }), userController.logIn);
+router.post('/api/forgot_password', userController.forgotPassword);
+router.post('/api/reset_password', bodyParser.urlencoded({ extended: false }), userController.resetPassword);
+router.get('/api/users/list', userController.authenticate, userController.list);
+router.get('/api/users/read/:id', userController.authenticate, userController.read);
+router.put('/api/users/update/:id', userController.authenticate, userController.update);
+router.delete('/api/users/remove/:id', userController.authenticate, userController.remove);
 /****************************************/
 
-/* GET home page. */
-router.get('/', function (req, res) {
-    res.render('home/index', { title: 'Express' });
-});
-router.get('/form', function (req, res) {
-    res.render('home/form');
-});
+/******** API Assets Routes *************/
+router.get( '/api/assets/queryquote', userController.authenticate ,assetController.getSearchQuotes);
+router.get( '/api/assets', userController.authenticate ,assetController.getAllAssets);
+router.get( '/api/assets/:asset', userController.authenticate, assetController.getAssetById);
+router.post('/api/assets', userController.authenticate, assetController.newAsset);
+router.post('/api/assets/movement', userController.authenticate, assetController.newMovement);
+router.put( '/api/assets', userController.authenticate, assetController.editAsset);
+router.delete('/api/assets', userController.authenticate, assetController.deleteAsset);
+router.put( '/api/assets/movement', userController.authenticate, assetController.editMovement);
+/****************************************/
 
-router.get( '/ativos', ativoController.index);
-router.get('/api/ativos', ativoController.indexList);
+/******** API Goals Routes *************/
+router.get('/api/goals', userController.authenticate, goalController.getAllGoals);
+router.post('/api/goals', userController.authenticate, goalController.createGoal);
+router.put('/api/goals', userController.authenticate, goalController.updateGoal);
+router.get('/api/goals/:goal', userController.authenticate, goalController.getGoal);
+router.delete('/api/goals', userController.authenticate, goalController.deleteGoal);
+/****************************************/
 
-router.get( '/ativos/create', ativoController.create);
-router.post('/ativos/create', ativoController.createAtivo);
+/******** API Quotes Routes *************/
+router.get('/refresh_quotes', assetController.refreshQuotes);
+router.get('/quotes', assetController.getQuotes);
 
-router.post('/ativos/newtrade', ativoController.createTrade);
-router.post('/ativos/edit', ativoController.editAtivo);
-router.post('/ativos/edittrade', ativoController.editTrade);
+/****************************************/
 
-var goalController = require('../controllers/goalController');
-router.get( '/goals/', goalController.index);
-router.post('/goals/', goalController.indexList);
-router.post('/goals/create', goalController.createGoal);
-router.get( '/goals/:goalID', goalController.ShowGoal);
-router.post('/goals/:goalID', goalController.ShowGoalData);
-router.get('/goalsDEBUG/:goalID', goalController.ShowGoalData);
 module.exports = router;
-
-
-
-/* res.render('ativos/index', { title: 'Express' }  */

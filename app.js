@@ -1,3 +1,7 @@
+/*
+API ALPHA VANTAGE: 7M2GANU4CTO5UTMU
+*/
+
 // Helpers for errors
 const createError = require('http-errors');
 // Express framework
@@ -12,25 +16,27 @@ const logger = require('morgan');
 const hbs = require('express-handlebars');
 // CSS compiler
 const sassMiddleware = require('node-sass-middleware');
-
 //CORS
 const cors = require('cors');
-
 // Create the index routes
 const indexRouter = require('./routes/index');
+// Cron jobs
+const cron = require('node-cron');
+const alphaVantage = require('./services/alphaVantageWorker');
 
 const app = express();
 app.use(cors());
 
 // Set up mongoose connection
 const mongoose = require('mongoose');
-const mongoDB = 'mongodb://marangoni:m4r4ng0n1@ds045107.mlab.com:45107/node-assets';
+mongoose.set('useUnifiedTopology', true);
+const mongoDB = 'mongodb://nodeapi:a123456789@ds045107.mlab.com:45107/node-assets';
 mongoose.connect(mongoDB, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 mongoose.set('useCreateIndex', true);
-mongoose.set('useFindAndModify',false);
+mongoose.set('useFindAndModify', false);
 
 // Set up handlebars view engine
 app.engine('hbs', hbs({
@@ -63,12 +69,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use(function (req, res, next) {
+  //next(createError(404));
+  res.send({ message: 'PAGE_NOT_FOUND' });
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -77,5 +84,21 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('layouts/error');
 });
+
+/**
+ # ┌────────────── second (optional)
+ # │ ┌──────────── minute
+ # │ │ ┌────────── hour
+ # │ │ │ ┌──────── day of month
+ # │ │ │ │ ┌────── month
+ # │ │ │ │ │ ┌──── day of week
+ # │ │ │ │ │ │
+ # │ │ │ │ │ │
+ # * * * * * *
+ */
+cron.schedule('*/2 * * * *', () => {
+  //alphaVantage.updateQuotes();
+});
+
 
 module.exports = app;
