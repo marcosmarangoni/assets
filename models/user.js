@@ -30,7 +30,7 @@ const UserSchema = new Schema(
         type: String,
         required: [true, 'Please insert your first name'],
         validate: {
-          validator: (v) => /^[\w']+$/.test(v),
+          validator: (v) => /^[\w' ]+$/.test(v),
           message: (props) => `${props.value} is in a wrong format!`,
         },
         max: [30, 'Sorry you reached the maximum number of characters'],
@@ -39,7 +39,7 @@ const UserSchema = new Schema(
         type: String,
         required: [true, 'Please insert your last name'],
         validate: {
-          validator: (v) => /^[\w']+$/.test(v),
+          validator: (v) => /^[\w' ]+$/.test(v),
           message: (props) => `${props.value} is in a wrong format!`,
         },
         max: [30, 'Sorry you reached the maximum number of characters'],

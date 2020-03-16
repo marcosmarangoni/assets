@@ -191,14 +191,15 @@ async function update(request, response) {
       first_name:request.body.first_name,
       last_name: request.body.last_name,
       password: request.body.password, //User current password
-      status:''
+      status2:''
     };
 
   try {
      //Check if the user is change the password for the same his using currently
    if(securityService.encrypt(request.body.new_password1) === request.body.password
     && (request.body.new_password1).trim() !== ''){
-    newInfo.status = 'Same Password';
+    newInfo.status2 = 'Same Password';
+    response.status(403).send({ error: true, message: 'Same Password' });
     }
     //Check if  user have entered 2 equal passwords and its not blank, if yes change the current password
     else if(request.body.new_password1 === request.body.new_password2 &&
@@ -209,17 +210,20 @@ async function update(request, response) {
     //Check if user have entered different password
     else if(request.body.new_password1 !== request.body.new_password2 &&
       (request.body.new_password1).trim() !== '' ) {
-      newInfo.status = 'Password Does Not Match';
+      newInfo.status2 = 'Password Does Not Match';
+      response.status(403).json({ message:'Password Does Not Match' });
     } 
 
+    if(newInfo.status2===''){
     let result = await User.findOneAndUpdate({ _id: request.user.id }, {
         $set: newInfo
-    },{ new:true });    
+    },{ new:true });  
+  }  
     
     response.json(newInfo);
 
 } catch (error) {
-    response.json(error);
+    response.status(500).json(error);
 }
 
 
