@@ -49,9 +49,8 @@ const UserSchema = new Schema(
       },
       stats: {
           type: Object,
-          assetamt: { type: Number },
-          return: { type: Number },
-          goalEnd: { type: Date }
+          asset_amt: { type: Number },
+          return: { type: Number }
       }
     }
 );

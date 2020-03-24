@@ -3,6 +3,7 @@ const { Movement } = require('../models/movement.js');
 const alphaVatage = require('../services/alphaVantageWorker');
 const momentjs = require('moment');
 const Quotes = require('../models/quote');
+const User = require('./../models/user.js');
 
 
 /*************************************/
@@ -24,6 +25,7 @@ async function getAllAssets(request, response) {
             Assets[x].movements.forEach(movement => {
                 AssetTotal.movements.push(movement);
             });
+            AssetTotal.movements.pop();
             AssetTotal.unit += Assets[x].total;
             AssetTotal.sum_in += Assets[x].sum_in;
             AssetTotal.sum_out += Assets[x].sum_out;
@@ -32,6 +34,8 @@ async function getAllAssets(request, response) {
         //Excluding movements before send.
         AssetTotal.movements = [];
     }
+    const newStats = {asset_amt: AssetTotal.total, return:AssetTotal.irr};
+    await User.findOneAndUpdate({ _id: request.user.id }, {stats : newStats});
     response.json({ assets: Assets, asset_total: AssetTotal });
 }
 
@@ -128,59 +132,56 @@ async function newMovement(request, response) {
     }
 }
 
+async function deleteAsset(request, response) {
+    try {
+        await Asset.findByIdAndDelete({user_id: request.user.id, _id: request.body._id});    
+        response.send({"deleted":true});
+    } catch (error) {
+        response.status(500).send({ message: error.message });
+    }
+}
+
 /************************************************************/
 //Edit Asset
 async function editAsset(request, response) {
+    let partialAsset = {
+        name: request.body.name,
+        balance: Number(request.body.balance),
+        unit: Number(request.body.unit),
+        autorefresh: request.body.autorefresh
+    };
 
-    if(request.body.delete && request.user.username===request.body.deletechecker && request.body._id) {
-        try {
-            await Asset.findByIdAndDelete({user_id: request.user.id, _id: request.body._id});    
-            response.send({"deleted":true});
-        } catch (error) {
-            response.send(error)
-        }
+    //No requided info
+    if(request.body.autorefresh && request.body.code) {
+        partialAsset.autorefresh = true;
+        partialAsset.code = request.body.code; 
     } else {
-        let partialAsset = {
-            name: request.body.name,
-            balance: Number(request.body.balance),
-            unit: Number(request.body.unit),
-            autorefresh: request.body.autorefresh
-        };
+        partialAsset.autorefresh = false;
+        partialAsset.code = ''; 
+    }    
+    if(request.body.group_a) { partialAsset.group_a = request.body.group_a; }
+    if(request.body.group_b) { partialAsset.group_b = request.body.group_b; }
+    if(request.body.group_c) { partialAsset.group_c = request.body.group_c; }
     
-        //No requided info
-        if(request.body.autorefresh && request.body.code) {
-            partialAsset.autorefresh = true;
-            partialAsset.code = request.body.code; 
-        } else {
-            partialAsset.autorefresh = false;
-            partialAsset.code = ''; 
-        }    
-        if(request.body.group_a) { partialAsset.group_a = request.body.group_a; }
-        if(request.body.group_b) { partialAsset.group_b = request.body.group_b; }
-        if(request.body.group_c) { partialAsset.group_c = request.body.group_c; }
-        
-        try {
-            await Asset.findOneAndUpdate({ user_id: request.user.id, _id: request.body._id }, {
-                $set: partialAsset
-            });        
-            response.json(partialAsset);
-    
-        } catch (error) {
-            response.status(500).send(error.message);
-        }
-    }   
+    try {
+        await Asset.findOneAndUpdate({ user_id: request.user.id, _id: request.body._id }, {
+            $set: partialAsset
+        });        
+        response.json(partialAsset);
+
+    } catch (error) {
+        response.status(500).send(error.message);
+    }
 }
 
 /************************************************************/
 // Edit Movement
 async function editMovement(request, response) {
-    const id = request.body.id;
-    const tradeid = request.body.tradeid;
 
-    if (request.body.remove !== undefined && request.body.remove) {
-        //TODO DELETE!
-        //await Ativo.findOneAndUpdate({ _id: id }, { $pull: { trades: { trade_id: mongoose.Types.ObjectId(tradeid) } } });
-
+    if (request.body.delete !== undefined && request.body.delete) {
+        const movement = await Asset.findOneAndUpdate({ user_id: request.user.id, _id: request.body.asset },
+             { $pull: { movements: { _id: request.body.movement } } });
+             response.json(movement);
     } else {
         //console.log(request.body.date);
         const partialMovement = {
@@ -227,7 +228,6 @@ async function getSearchQuotes(req, res) {
     } catch (error) {
         res.send(error);
     }
-    //res.send(JSON.parse('[{"code": "HMC","name": "Honda Motor Co. Ltd.","currency": "USD"},{"code": "HMCTF","name": "Hainan Meilan International Airport Company Limited",         "currency": "USD"        },        {            "code": "HMCNX",            "name": "Harbor Mid Cap Fund Investor Class",            "currency": "USD"        }]'));
 }
 
 async function getQuotes(req,res){
@@ -247,6 +247,7 @@ module.exports = {
     newAsset,
     newMovement,
     editAsset,
+    deleteAsset,
     editMovement,
     refreshQuotes,
     getSearchQuotes,

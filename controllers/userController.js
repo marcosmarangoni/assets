@@ -1,6 +1,6 @@
 const User = require('../models/user');
 const securityService = require('../services/securityService');
-//const emailTemplate = require('../public/resetPasswordEmail.html');
+const DeviceDetector = require('device-detector-js');
 const fs = require('fs');
 
 const nodemailer = require('nodemailer');
@@ -26,7 +26,7 @@ async function authenticate(req, res, next) {
     }
     const token = req.headers.authorization;
     const decodedJWT = securityService.decodeJWT(token);
-    console.log(decodedJWT);
+    //console.log(decodedJWT);
     const user = await User.findOne({ username: decodedJWT.username });
     req.user = user;
     next();
@@ -92,10 +92,21 @@ async function logIn(request, response) {
 async function forgotPassword(request, response) {
   const username = request.body.username;
   try {
+    const deviceDetector = new DeviceDetector();
+    const device = deviceDetector.parse(request.headers['user-agent']);
     const user = await User.findOne({ username });
     const forgotPasswordToken = securityService.generateSecretKey(20);
     let emailTemplate = fs.readFileSync(`${__dirname}/../public/resetPasswordEmail.html`).toString();
-    emailTemplate = emailTemplate.replace('{RESET_PASSWORD_LINK}', 'https://localhost:4000/api/reset_password?token=' + forgotPasswordToken);
+
+    // Enable deep link
+    let emailPasswordLink = '';
+    if(device.os.name === 'Android') {
+      emailPasswordLink = `http://www.assetslookup.com/forgot_password?token=${forgotPasswordToken}&username=${username}`;
+    } else {
+      emailPasswordLink = `http://localhost:3000/reset_password?token=${forgotPasswordToken}&username=${username}`;
+    }
+
+    emailTemplate = emailTemplate.replace('{RESET_PASSWORD_LINK}', emailPasswordLink);
     const mailOptions = {
       from: 'assetslookup@gmail.com',
       to: username,
@@ -108,6 +119,30 @@ async function forgotPassword(request, response) {
     response.send({ message: 'EMAIL_SENT' });
   } catch (error) {
     response.status(500).send({ error: true, message: error });
+  }
+}
+
+/**
+ * 
+ * @param {Request} request 
+ * @param {Response} response 
+ */
+async function resetPassword(request, response) {
+  const username = request.body.username;
+  const newPassword = request.body.password;
+  const token = request.body.forgot_password_token;
+  try {
+    const user = await User.findOne({ username });
+    if(user.forgot_password_token === token) {
+      user.password = newPassword;
+      user.forgot_password_token = "";
+      await user.save();
+      response.send({ message: "OK" });
+    } else {
+      response.status(401).send({ message: "Invalid token for your email" });
+    }
+  } catch (error) {
+    response.status(500).send({ message: error.message });
   }
 }
 
@@ -134,7 +169,13 @@ async function list(request, response) {
  * @param {*} response 
  */
 async function read(request, response) {
-  response.send('NOT IMPLEMENTED: READ_USER');
+  try {
+    response.json(request.user);
+  } catch (error) {
+    response.status(500).send({ error: true, message: error });
+  }
+
+  //response.send('NOT IMPLEMENTED: READ_USER');
 }
 
 /**
@@ -143,7 +184,45 @@ async function read(request, response) {
  * @param {*} response 
  */
 async function update(request, response) {
-  response.send('NOT IMPLEMENTED: UPDATE_USER');
+  console.log('Request NODE - ANDRe', request);
+
+  let newInfo = {
+      username: request.body.username,
+      first_name:request.body.first_name,
+      last_name: request.body.last_name,
+      password: request.body.password, //User current password
+      status:''
+    };
+
+  try {
+     //Check if the user is change the password for the same his using currently
+   if(securityService.encrypt(request.body.new_password1) === request.body.password
+    && (request.body.new_password1).trim() !== ''){
+    newInfo.status = 'Same Password';
+    }
+    //Check if  user have entered 2 equal passwords and its not blank, if yes change the current password
+    else if(request.body.new_password1 === request.body.new_password2 &&
+      (request.body.new_password1).trim() !== '' ) {
+      newInfo.password = securityService.encrypt(request.body.new_password1); //encrypt new password
+    }
+
+    //Check if user have entered different password
+    else if(request.body.new_password1 !== request.body.new_password2 &&
+      (request.body.new_password1).trim() !== '' ) {
+      newInfo.status = 'Password Does Not Match';
+    } 
+
+    let result = await User.findOneAndUpdate({ _id: request.user.id }, {
+        $set: newInfo
+    },{ new:true });    
+    
+    response.json(newInfo);
+
+} catch (error) {
+    response.json(error);
+}
+
+
 }
 
 /**
@@ -163,5 +242,6 @@ module.exports = {
   update,
   remove,
   authenticate,
-  forgotPassword
+  forgotPassword,
+  resetPassword
 };
