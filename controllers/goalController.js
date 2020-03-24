@@ -46,11 +46,12 @@ async function updateGoal(req, res) {
 }
 
 async function getGraph(req, res) {
+    console.log("GENERATING")
     console.log(req.body);
     data = buildData(req.body);
 
-    const width = 400;
-    const height = 400;
+    const width = 800;
+    const height = 600;
     const canvasRenderService = new CanvasRenderService(width, height, (ChartJS) => { });
 
     const configuration = {
@@ -108,12 +109,12 @@ buildData = (fields) => {
     let minDate = new Date();
     let maxDate = new Date();
 
-    for (let i = 0; i < fields.data.boxes.length; ++i) {
-        fields.data.boxes[i].dateStart = new Date(fields.data.boxes[i].dateStart);
-        fields.data.boxes[i].dateEnd = new Date(fields.data.boxes[i].dateEnd);
-        if (minDate > fields.data.boxes[i].dateStart) { minDate = fields.data.boxes[i].dateStart }
-        if (maxDate < fields.data.boxes[i].dateEnd) { maxDate = fields.data.boxes[i].dateEnd }
-        ds.labels.push(fields.data.boxes[i].description);
+    for (let i = 0; i < fields.boxes.length; ++i) {
+        fields.boxes[i].dateStart = new Date(fields.boxes[i].dateStart);
+        fields.boxes[i].dateEnd = new Date(fields.boxes[i].dateEnd);
+        if (minDate > fields.boxes[i].dateStart) { minDate = fields.boxes[i].dateStart }
+        if (maxDate < fields.boxes[i].dateEnd) { maxDate = fields.boxes[i].dateEnd }
+        ds.labels.push(fields.boxes[i].description);
         ds.data.push([]);
     }
     ds.labels.push("Result");
@@ -147,7 +148,7 @@ pushMonth = (month, ds, fields, result) => {
     const header = monthNames[month.getMonth()] + " " + month.getFullYear();
     //const tds = [<th key={header}>{header}</th>];
     ds.x_labels.push(header);
-    fields.data.boxes.forEach((box, i) => {
+    fields.boxes.forEach((box, i) => {
         let value = box.value;
         //Current after Start and before end
         if (evaluateDate(month, box.dateStart) >= 0 && evaluateDate(month, box.dateEnd) <= 0) {
